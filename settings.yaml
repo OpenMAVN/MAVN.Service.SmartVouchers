@@ -1,0 +1,31 @@
+SmartVouchersService:
+  Db:
+    LogsConnString:
+      settings-key: SmartVouchersService-LogsConnString
+      types:
+        - AzureTableStorage
+    SqlDbConnString:
+      settings-key: SmartVouchersService-SqlDbConnString
+  Rabbit:
+    Publishers:
+      ConnectionString:
+        settings-key: Pub-ConnectionString
+        types:
+          - RabbitMq
+    Subscribers:
+      ConnectionString:
+        settings-key: Sub-ConnectionString
+        types:
+          - RabbitMq
+SlackNotifications:
+    AzureQueue:
+        ConnectionString:
+            settings-key: SlackNotificationsConnString
+            types:
+                - AzureTableStorage
+        QueueName:
+            settings-key: SlackQueueName
+MonitoringServiceClient:
+    MonitoringServiceUrl:
+        settings-key: MonitoringServiceUrl
+

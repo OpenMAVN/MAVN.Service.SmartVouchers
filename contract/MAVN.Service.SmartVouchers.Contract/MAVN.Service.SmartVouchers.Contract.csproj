@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.1</Version>
+    <Authors>Lykke</Authors>
+    <Company>LykkeBisiness</Company>
+    <Description>Contract for the Lykke.Service.SmartVouchers</Description>
+    <PackageLicenseUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers</PackageProjectUrl>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/14153330?v=3&amp;amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>LykkeBiz;SmartVouchers</PackageTags>
+    <PackageId>LykkeBiz.Service.SmartVouchers.Contract</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\Lykke.Service.SmartVouchers.Contract.xml</DocumentationFile>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Lykke.Service.SmartVouchers.Contract.xml</DocumentationFile>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Label="dotnet pack instructions">
+    <Content Include="$(OutputPath)Lykke.Service.SmartVouchers.Contract.pdb">
+      <Pack>true</Pack>
+      <PackagePath>lib/netstandard2.0</PackagePath>
+    </Content>
+  </ItemGroup>
+
+</Project>
