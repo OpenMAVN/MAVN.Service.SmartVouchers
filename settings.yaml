@@ -9,12 +9,12 @@ SmartVouchersService:
   Rabbit:
     Publishers:
       ConnectionString:
-        settings-key: Pub-ConnectionString
+        settings-key: WalletManagementRabbitMQ
         types:
           - RabbitMq
     Subscribers:
       ConnectionString:
-        settings-key: Sub-ConnectionString
+        settings-key: WalletManagementRabbitMQ
         types:
           - RabbitMq
 SlackNotifications:
