@@ -43,6 +43,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 Status = VoucherStatus.InStock,
                 ValidationCodeHash = hash,
                 OwnerId = ownerId,
+                PurchaseDate = DateTime.UtcNow,
             };
 
             voucher.Id = await _vouchersRepository.CreateAsync(voucher);
@@ -63,6 +64,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 return VoucherValidationError.WrongValidationCode;
 
             voucher.Status = VoucherStatus.Sold;
+            voucher.RedemptionDate = DateTime.UtcNow;
             await _vouchersRepository.UpdateAsync(voucher);
 
             return VoucherValidationError.None;

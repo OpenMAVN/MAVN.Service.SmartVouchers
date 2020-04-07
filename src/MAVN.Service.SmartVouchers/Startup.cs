@@ -1,5 +1,4 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using AutoMapper;
 using JetBrains.Annotations;
 using Lykke.Logs.Loggers.LykkeSlack;
@@ -10,7 +9,6 @@ using MAVN.Service.SmartVouchers.Settings;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -56,7 +54,7 @@ namespace MAVN.Service.SmartVouchers
 
                 options.Extend = (sc, settings) =>
                 {
-                    sc.AddAutoMapper(typeof(AutoMapperProfile));
+                    sc.AddAutoMapper(typeof(AutoMapperProfile), typeof(MsSqlRepositories.AutoMapperProfile));
                     /*
                     sc
                         .AddOptions()

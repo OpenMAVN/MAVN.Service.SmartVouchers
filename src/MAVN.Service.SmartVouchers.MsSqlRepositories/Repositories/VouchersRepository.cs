@@ -52,7 +52,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
 
                 if (!string.IsNullOrWhiteSpace(validationCode))
                 {
-                    var validation = await context.VoucherValidations.FirstAsync(v => v.VoucherId == entity.Id);
+                    var validation = await context.VoucherValidations.FirstOrDefaultAsync(v => v.VoucherId == entity.Id);
                     if (validation != null)
                         validation.ValidationCode = validationCode;
                     else
