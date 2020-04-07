@@ -2,8 +2,6 @@
 using AutoMapper;
 using MAVN.Service.SmartVouchers.Client.Models.Requests;
 using MAVN.Service.SmartVouchers.Client.Models.Responses;
-using MAVN.Service.SmartVouchers.Client.Models.Responses.Enums;
-using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 
 namespace MAVN.Service.SmartVouchers
@@ -43,18 +41,12 @@ namespace MAVN.Service.SmartVouchers
             CreateMap<CampaignImageFileRequest, FileModel>(MemberList.Destination)
                 .ForMember(e => e.Language, opt => opt.MapFrom(c => c.Localization));
 
-            CreateMap<CampaignUpdateError, VoucherCampaignErrorCodes>(MemberList.Source);
-            CreateMap<ImageSaveError, VoucherCampaignErrorCodes>(MemberList.Source);
-
             // Vouchers
             CreateMap<VoucherWithValidation, VoucherDetailsResponseModel>(MemberList.Destination);
             CreateMap<VouchersPage, PaginatedVouchersListResponseModel>(MemberList.Destination);
             CreateMap<Voucher, VoucherResponseModel>(MemberList.Destination);
 
             CreateMap<BasePaginationRequestModel, PageInfo>(MemberList.Destination);
-
-            CreateMap<VoucherValidationError, VoucherErrorCodes>(MemberList.Source);
-            CreateMap<TransferVoucherError, VoucherErrorCodes>(MemberList.Source);
         }
     }
 }

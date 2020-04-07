@@ -1,11 +1,11 @@
 ﻿namespace MAVN.Service.SmartVouchers.Domain.Enums
 {
-    public enum VoucherValidationError
+    public enum RedeemVoucherError
     {
-        None,
-        VoucherCampaignNotFound,
-        NoAvailableVouchers,
+        None = 0,
         VoucherNotFound,
         WrongValidationCode,
+        VoucherCampaignNotFound,
+        VoucherCampaignNotActive,
     }
 }

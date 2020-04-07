@@ -1,9 +1,10 @@
 ﻿namespace MAVN.Service.SmartVouchers.Domain.Enums
 {
-    public enum ImageSaveError
+    public enum BuyVoucherError
     {
         None = 0,
         VoucherCampaignNotFound,
-        InvalidFileFormat,
+        VoucherCampaignNotActive,
+        NoAvailableVouchers,
     }
 }

@@ -1,20 +1,14 @@
 ﻿namespace MAVN.Service.SmartVouchers.Client.Models.Responses.Enums
 {
     /// <summary>
-    /// Voucher error codes
+    /// Voucher tarnsfer error codes
     /// </summary>
-    public enum VoucherErrorCodes
+    public enum TransferVoucherErrorCodes
     {
         /// <summary>No error code</summary>
-        None = 0,
-        /// <summary>Voucher campaign not found</summary>
-        VoucherCampaignNotFound,
-        /// <summary>No available vouchers</summary>
-        NoAvailableVouchers,
+        None,
         /// <summary>Voucher not found</summary>
         VoucherNotFound,
-        /// <summary>Wrong validation code</summary>
-        WrongValidationCode,
         /// <summary>Not an owner</summary>
         NotAnOwner,
         /// <summary>Voucher is already used</summary>

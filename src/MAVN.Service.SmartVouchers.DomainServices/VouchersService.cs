@@ -27,14 +27,19 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _log = logFactory.CreateLog(this);
         }
 
-        public async Task<VoucherValidationError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId)
+        public async Task<BuyVoucherError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId)
         {
             var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
             if (campaign == null)
-                return VoucherValidationError.VoucherCampaignNotFound;
+                return BuyVoucherError.VoucherCampaignNotFound;
+
+            if (campaign.State != CampaignState.Published
+                || DateTime.UtcNow < campaign.FromDate
+                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+                return BuyVoucherError.VoucherCampaignNotActive;
 
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
-                return VoucherValidationError.NoAvailableVouchers;
+                return BuyVoucherError.NoAvailableVouchers;
 
             var (validationCode, hash) = GenerateValidation();
             var voucher = new Voucher
@@ -51,23 +56,33 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             await _vouchersRepository.UpdateAsync(voucher, validationCode);
 
-            return VoucherValidationError.None;
+            return BuyVoucherError.None;
         }
 
-        public async Task<VoucherValidationError> RedeemVoucherAsync(string voucherShortCode, string validationCode)
+        public async Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode)
         {
             var voucher = await _vouchersRepository.GetByShortCodeAsync(voucherShortCode);
             if (voucher == null)
-                return VoucherValidationError.VoucherNotFound;
+                return RedeemVoucherError.VoucherNotFound;
+
+            var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId);
+            if (campaign == null)
+                return RedeemVoucherError.VoucherCampaignNotFound;
+
+            if (campaign.State != CampaignState.Published
+                || DateTime.UtcNow < campaign.FromDate
+                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+                return RedeemVoucherError.VoucherCampaignNotActive;
 
             if (voucher.ValidationCode != validationCode)
-                return VoucherValidationError.WrongValidationCode;
+                return RedeemVoucherError.WrongValidationCode;
 
             voucher.Status = VoucherStatus.Sold;
             voucher.RedemptionDate = DateTime.UtcNow;
+
             await _vouchersRepository.UpdateAsync(voucher);
 
-            return VoucherValidationError.None;
+            return RedeemVoucherError.None;
         }
 
         public async Task<TransferVoucherError> TransferVoucherAsync(

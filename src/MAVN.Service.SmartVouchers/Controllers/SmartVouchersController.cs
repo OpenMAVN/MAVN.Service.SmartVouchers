@@ -31,12 +31,12 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// </summary>
         /// <param name="model">The model that describes voucher buy request.</param>
         [HttpPost]
-        [ProducesResponseType(typeof(VoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherErrorCodes> BuyVoucherAsync([FromBody] VoucherBuyModel model)
+        [ProducesResponseType(typeof(BuyVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<BuyVoucherErrorCodes> BuyVoucherAsync([FromBody] VoucherBuyModel model)
         {
             var result = await _vouchersService.BuyVoucherAsync(model.VoucherCampaignId, model.CustomerId);
 
-            return _mapper.Map<VoucherErrorCodes>(result);
+            return _mapper.Map<BuyVoucherErrorCodes>(result);
         }
 
         /// <summary>
@@ -87,12 +87,12 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// </summary>
         /// <param name="model">The model that describes voucher redemption request.</param>
         [HttpPost("usage")]
-        [ProducesResponseType(typeof(VoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherErrorCodes> RedeemVoucherAsync([FromBody] VoucherRedeptionModel model)
+        [ProducesResponseType(typeof(RedeemVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<RedeemVoucherErrorCodes> RedeemVoucherAsync([FromBody] VoucherRedeptionModel model)
         {
             var result = await _vouchersService.RedeemVoucherAsync(model.VoucherShortCode, model.VoucherValidationCode);
 
-            return _mapper.Map<VoucherErrorCodes>(result);
+            return _mapper.Map<RedeemVoucherErrorCodes>(result);
         }
 
         /// <summary>
@@ -100,15 +100,15 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// </summary>
         /// <param name="model">The model that describes voucher transfer request.</param>
         [HttpPut]
-        [ProducesResponseType(typeof(VoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherErrorCodes> TransferVoucherAsync([FromBody] VoucherTransferModel model)
+        [ProducesResponseType(typeof(TransferVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<TransferVoucherErrorCodes> TransferVoucherAsync([FromBody] VoucherTransferModel model)
         {
             var result = await _vouchersService.TransferVoucherAsync(
                 model.VoucherShortCode,
                 model.OldOwnerId,
                 model.NewOwnerId);
 
-            return _mapper.Map<VoucherErrorCodes>(result);
+            return _mapper.Map<TransferVoucherErrorCodes>(result);
         }
     }
 }

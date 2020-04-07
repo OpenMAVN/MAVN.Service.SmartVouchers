@@ -28,38 +28,34 @@ namespace MAVN.Service.SmartVouchers.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(VoucherCampaignErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherCampaignErrorCodes> CreateAsync([FromBody] VoucherCampaignCreateModel model)
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        public Task<Guid> CreateAsync([FromBody] VoucherCampaignCreateModel model)
         {
             var campaign = _mapper.Map<VoucherCampaign>(model);
 
-            await _campaignsService.CreateAsync(campaign);
-
-            return VoucherCampaignErrorCodes.None;
+            return _campaignsService.CreateAsync(campaign);
         }
 
         /// <inheritdoc/>
         /// <response code="200">The campaign successfully updated.</response>
         [HttpPut]
-        [ProducesResponseType(typeof(VoucherCampaignErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherCampaignErrorCodes> UpdateAsync([FromBody] VoucherCampaignEditModel model)
+        [ProducesResponseType(typeof(UpdateVoucherCampaignErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<UpdateVoucherCampaignErrorCodes> UpdateAsync([FromBody] VoucherCampaignEditModel model)
         {
             var campaign = _mapper.Map<VoucherCampaign>(model);
 
             var error = await _campaignsService.UpdateAsync(campaign);
 
-            return _mapper.Map<VoucherCampaignErrorCodes>(error);
+            return _mapper.Map<UpdateVoucherCampaignErrorCodes>(error);
         }
 
         /// <inheritdoc/>
         /// <response code="200">The campaign successfully deleted.</response>
         [HttpDelete("{campaignId}")]
-        [ProducesResponseType(typeof(VoucherCampaignErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherCampaignErrorCodes> DeleteAsync(Guid campaignId)
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        public Task<bool> DeleteAsync(Guid campaignId)
         {
-            await _campaignsService.DeleteAsync(campaignId);
-
-            return VoucherCampaignErrorCodes.None;
+            return _campaignsService.DeleteAsync(campaignId);
         }
 
         /// <inheritdoc/>
@@ -113,14 +109,14 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// <inheritdoc/>
         /// <response code="200">The campaign's image is successfully updated.</response>
         [HttpPost("image")]
-        [ProducesResponseType(typeof(VoucherCampaignErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<VoucherCampaignErrorCodes> SetImage([FromBody] CampaignImageFileRequest model)
+        [ProducesResponseType(typeof(SaveImageErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<SaveImageErrorCodes> SetImage([FromBody] CampaignImageFileRequest model)
         {
             var file = _mapper.Map<FileModel>(model);
 
             var error = await _campaignsService.SaveCampaignContentImage(file);
 
-            return _mapper.Map<VoucherCampaignErrorCodes>(error);
+            return _mapper.Map<SaveImageErrorCodes>(error);
         }
     }
 }

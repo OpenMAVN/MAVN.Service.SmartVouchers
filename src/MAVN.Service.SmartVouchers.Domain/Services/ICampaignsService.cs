@@ -9,7 +9,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
     public interface ICampaignsService
     {
         Task<Guid> CreateAsync(VoucherCampaign campaign);
-        Task<CampaignUpdateError> UpdateAsync(VoucherCampaign campaign);
+        Task<UpdateCampaignError> UpdateAsync(VoucherCampaign campaign);
         Task<bool> DeleteAsync(Guid campaignId);
         Task<VoucherCampaign> GetByIdAsync(Guid campaignId);
         Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds);

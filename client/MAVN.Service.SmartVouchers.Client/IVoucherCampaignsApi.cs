@@ -41,26 +41,26 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         /// <param name="model">The model that describes voucher campaign model.</param>
         [Post("/api/campaigns")]
-        Task<VoucherCampaignErrorCodes> CreateAsync([Body] VoucherCampaignCreateModel model);
+        Task<Guid> CreateAsync([Body] VoucherCampaignCreateModel model);
 
         /// <summary>
         /// Updates existing vooucher campaign.
         /// </summary>
         /// <param name="model">The model that describes voucher campaign model.</param>
         [Put("/api/campaigns")]
-        Task<VoucherCampaignErrorCodes> UpdateAsync([Body] VoucherCampaignEditModel model);
+        Task<UpdateVoucherCampaignErrorCodes> UpdateAsync([Body] VoucherCampaignEditModel model);
 
         /// <summary>
         /// Deletes Campaign by identification.
         /// </summary>
         [Delete("/api/campaigns/{campaignId}")]
-        Task<VoucherCampaignErrorCodes> DeleteAsync(Guid campaignId);
+        Task<bool> DeleteAsync(Guid campaignId);
 
         /// <summary>
         /// Adds new Campaign's content image
         /// </summary>
         /// <param name="model">The model that describes the file.</param>
         [Post("/api/campaigns/image")]
-        Task<VoucherCampaignErrorCodes> SetImage([Body] CampaignImageFileRequest model);
+        Task<SaveImageErrorCodes> SetImage([Body] CampaignImageFileRequest model);
     }
 }

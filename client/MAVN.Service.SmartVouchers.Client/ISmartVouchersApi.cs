@@ -19,21 +19,21 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         /// <param name="model">The model that describes voucher buy request.</param>
         [Post("/api/vouchers")]
-        Task<VoucherErrorCodes> BuyVoucherAsync([Body] VoucherBuyModel model);
+        Task<BuyVoucherErrorCodes> BuyVoucherAsync([Body] VoucherBuyModel model);
 
         /// <summary>
         /// Redeem a voucher.
         /// </summary>
         /// <param name="model">The model that describes voucher redemption request.</param>
         [Post("/api/vouchers/usage")]
-        Task<VoucherErrorCodes> RedeemVoucherAsync([Body] VoucherRedeptionModel model);
+        Task<RedeemVoucherErrorCodes> RedeemVoucherAsync([Body] VoucherRedeptionModel model);
 
         /// <summary>
         /// Transfer a new voucher to another owner.
         /// </summary>
         /// <param name="model">The model that describes voucher transfer request.</param>
         [Put("/api/vouchers")]
-        Task<VoucherErrorCodes> TransferVoucherAsync([Body] VoucherTransferModel model);
+        Task<TransferVoucherErrorCodes> TransferVoucherAsync([Body] VoucherTransferModel model);
 
         /// <summary>
         /// Get voucher deatils by its short code.

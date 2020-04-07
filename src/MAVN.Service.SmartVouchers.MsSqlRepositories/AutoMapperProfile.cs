@@ -9,8 +9,11 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
         public AutoMapperProfile()
         {
             CreateMap<VoucherCampaign, VoucherCampaignEntity>(MemberList.Destination);
+            CreateMap<VoucherCampaignEntity, VoucherCampaign>(MemberList.Destination);
 
             CreateMap<VoucherCampaignContent, VoucherCampaignContentEntity>(MemberList.Destination);
+            CreateMap<VoucherCampaignContentEntity, VoucherCampaignContent>(MemberList.Destination)
+                .ForMember(e => e.Image, opt => opt.Ignore());
 
             CreateMap<Voucher, VoucherEntity>(MemberList.Source);
 

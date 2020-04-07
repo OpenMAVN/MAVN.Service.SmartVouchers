@@ -7,8 +7,8 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
 {
     public interface IVouchersService
     {
-        Task<VoucherValidationError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId);
-        Task<VoucherValidationError> RedeemVoucherAsync(string voucherShortCode, string validationCode);
+        Task<BuyVoucherError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId);
+        Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode);
         Task<TransferVoucherError> TransferVoucherAsync(
             string voucherShortCode,
             Guid oldOwnerId,

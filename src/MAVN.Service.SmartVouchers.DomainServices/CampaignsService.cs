@@ -50,16 +50,16 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return result;
         }
 
-        public async Task<CampaignUpdateError> UpdateAsync(VoucherCampaign campaign)
+        public async Task<UpdateCampaignError> UpdateAsync(VoucherCampaign campaign)
         {
             var oldCampaign = await _campaignsRepository.GetByIdAsync(campaign.Id);
             if (oldCampaign == null)
             {
                 _log.Error($"Campaign {campaign.Id} not found for update");
-                return CampaignUpdateError.VoucherCampaignNotFound;
+                return UpdateCampaignError.VoucherCampaignNotFound;
             }
             if (campaign.VouchersTotalCount < oldCampaign.BoughtVouchersCount)
-                return CampaignUpdateError.TotalCountMustBeGreaterThanBoughtVouchersCount;
+                return UpdateCampaignError.TotalCountMustBeGreaterThanBoughtVouchersCount;
 
             campaign.CreatedBy = oldCampaign.CreatedBy;
             campaign.CreationDate = oldCampaign.CreationDate;
@@ -89,7 +89,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             _log.Info("Campaign was updated", context: campaign);
 
-            return CampaignUpdateError.None;
+            return UpdateCampaignError.None;
         }
 
         public async Task<bool> DeleteAsync(Guid campaignId)
@@ -145,7 +145,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             var campaign = await _campaignsRepository.GetByIdAsync(file.CampaignId);
 
             if (campaign == null)
-                return ImageSaveError.CampaignNotFound;
+                return ImageSaveError.VoucherCampaignNotFound;
 
             var campaignContent = campaign.LocalizedContents.FirstOrDefault(c =>
                 c.ContentType == CampaignContentType.ImageUrl && c.Language == file.Language);

@@ -1,6 +1,6 @@
 ﻿namespace MAVN.Service.SmartVouchers.Domain.Enums
 {
-    public enum CampaignUpdateError
+    public enum UpdateCampaignError
     {
         None,
         VoucherCampaignNotFound,
