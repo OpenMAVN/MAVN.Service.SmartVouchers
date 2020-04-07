@@ -14,6 +14,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MAVN.Service.SmartVouchers.MsSqlRepositories\MAVN.Service.SmartVouchers.MsSqlRepositories.csproj" />
     <ProjectReference Include="..\..\src\MAVN.Service.SmartVouchers\MAVN.Service.SmartVouchers.csproj" />
     <ProjectReference Include="..\..\src\MAVN.Service.SmartVouchers.DomainServices\MAVN.Service.SmartVouchers.DomainServices.csproj" />
   </ItemGroup>

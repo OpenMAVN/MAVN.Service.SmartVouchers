@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Xunit;
 
 namespace MAVN.Service.SmartVouchers.Tests
@@ -10,7 +10,14 @@ namespace MAVN.Service.SmartVouchers.Tests
         {
             // arrange
 
-            var mockMapper = new MapperConfiguration(cfg => { cfg.AddProfile(new AutoMapperProfile()); });
+            var mockMapper = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfiles(new Profile[]
+                {
+                    new AutoMapperProfile(),
+                    new MsSqlRepositories.AutoMapperProfile()
+                });
+            });
             var mapper = mockMapper.CreateMapper();
 
             // act

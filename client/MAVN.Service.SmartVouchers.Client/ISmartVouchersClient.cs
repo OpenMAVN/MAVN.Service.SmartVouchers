@@ -13,6 +13,6 @@ namespace MAVN.Service.SmartVouchers.Client
         // ONLY properties for accessing controller interfaces are allowed.
 
         /// <summary>Application Api interface</summary>
-        ISmartVouchersApi Api { get; }
+        IVoucherCampaignsApi Api { get; }
     }
 }

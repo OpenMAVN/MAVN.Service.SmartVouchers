@@ -31,10 +31,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\client\MAVN.Service.SmartVouchers.Client\MAVN.Service.SmartVouchers.Client.csproj" />
+    <ProjectReference Include="..\MAVN.Service.SmartVouchers.AzureRepositories\MAVN.Service.SmartVouchers.AzureRepositories.csproj" />
     <ProjectReference Include="..\MAVN.Service.SmartVouchers.DomainServices\MAVN.Service.SmartVouchers.DomainServices.csproj" />
     <ProjectReference Include="..\MAVN.Service.SmartVouchers.MsSqlRepositories\MAVN.Service.SmartVouchers.MsSqlRepositories.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 </Project>

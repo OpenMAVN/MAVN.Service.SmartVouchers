@@ -9,5 +9,8 @@ namespace MAVN.Service.SmartVouchers.Settings
 
         [SqlCheck]
         public string SqlDbConnString { get; set; }
+
+        [AzureTableCheck]
+        public string CampaignsImageConnString { get; set; }
     }
 }

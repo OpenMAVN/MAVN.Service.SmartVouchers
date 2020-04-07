@@ -6,6 +6,10 @@ SmartVouchersService:
         - AzureTableStorage
     SqlDbConnString:
       settings-key: SmartVouchersService-SqlDbConnString
+    CampaignsImageConnString:
+      settings-key: SmartVouchersService-CampaignsImageConnString
+      types:
+        - AzureTableStorage
   Rabbit:
     Publishers:
       ConnectionString:
