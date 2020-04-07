@@ -15,6 +15,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
         public DbSet<VoucherCampaignEntity> VoucherCampaigns { get; set; }
         public DbSet<VoucherCampaignContentEntity> CampaignsContents { get; set; }
         public DbSet<VoucherEntity> Vouchers { get; set; }
+        public DbSet<VoucherValidationEntity> VoucherValidations { get; set; }
 
         // empty constructor needed for EF migrations
         [UsedImplicitly]

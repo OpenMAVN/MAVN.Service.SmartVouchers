@@ -7,7 +7,8 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
     public interface IVouchersRepository
     {
         Task<long> CreateAsync(Voucher voucher);
-        Task UpdateAsync(Voucher voucher);
+        Task UpdateAsync(Voucher voucher, string validationCode = null);
+        Task<VoucherWithValidation> GetByShortCodeAsync(string shortCode);
         Task<VouchersPage> GetByCampaignIdAsync(
             Guid campaignId,
             int skip,

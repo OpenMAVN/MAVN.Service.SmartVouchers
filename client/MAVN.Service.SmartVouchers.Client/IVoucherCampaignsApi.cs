@@ -17,6 +17,7 @@ namespace MAVN.Service.SmartVouchers.Client
         /// <summary>
         /// Returns list of Campaigns.
         /// </summary>
+        /// <param name="request">The model that describes voucher campaigns request model.</param>
         /// <returns>CampaignListModel</returns>
         [Get("/api/campaigns")]
         Task<PaginatedVoucherCampaignsListResponseModel> GetAsync(VoucherCampaignsPaginationRequestModel request);
@@ -36,29 +37,30 @@ namespace MAVN.Service.SmartVouchers.Client
         Task<VoucherCampaignsListResponseModel> GetCampaignsByIds([Query(CollectionFormat.Multi)] Guid[] voicherCampaignsIds);
 
         /// <summary>
-        /// Adds new Campaign (with conditions).
+        /// Adds new voucher campaign.
         /// </summary>
-        /// <param name="model">The model that describes instrument.</param>
+        /// <param name="model">The model that describes voucher campaign model.</param>
         [Post("/api/campaigns")]
-        Task<VoucherCampaignServiceErrorCodes> CreateAsync([Body] VoucherCampaignCreateModel model);
+        Task<VoucherCampaignErrorCodes> CreateAsync([Body] VoucherCampaignCreateModel model);
 
         /// <summary>
-        /// Updates existing Campaign (with conditions).
+        /// Updates existing vooucher campaign.
         /// </summary>
+        /// <param name="model">The model that describes voucher campaign model.</param>
         [Put("/api/campaigns")]
-        Task<VoucherCampaignServiceErrorCodes> UpdateAsync([Body] VoucherCampaignEditModel model);
+        Task<VoucherCampaignErrorCodes> UpdateAsync([Body] VoucherCampaignEditModel model);
 
         /// <summary>
         /// Deletes Campaign by identification.
         /// </summary>
         [Delete("/api/campaigns/{campaignId}")]
-        Task<VoucherCampaignServiceErrorCodes> DeleteAsync(Guid campaignId);
+        Task<VoucherCampaignErrorCodes> DeleteAsync(Guid campaignId);
 
         /// <summary>
         /// Adds new Campaign's content image
         /// </summary>
         /// <param name="model">The model that describes the file.</param>
         [Post("/api/campaigns/image")]
-        Task<VoucherCampaignServiceErrorCodes> SetImage([Body] CampaignImageFileRequest model);
+        Task<VoucherCampaignErrorCodes> SetImage([Body] CampaignImageFileRequest model);
     }
 }

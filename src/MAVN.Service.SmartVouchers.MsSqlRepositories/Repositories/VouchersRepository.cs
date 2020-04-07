@@ -32,13 +32,17 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             {
                 context.Vouchers.Add(entity);
 
+                var campaign = await context.VoucherCampaigns.FindAsync(entity.CampaignId);
+                campaign.BoughtVouchersCount++;
+                context.VoucherCampaigns.Update(campaign);
+
                 await context.SaveChangesAsync();
 
                 return entity.Id;
             }
         }
 
-        public async Task UpdateAsync(Voucher voucher)
+        public async Task UpdateAsync(Voucher voucher, string validationCode = null)
         {
             var entity = _mapper.Map<VoucherEntity>(voucher);
 
@@ -46,7 +50,30 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             {
                 context.Vouchers.Update(entity);
 
+                if (!string.IsNullOrWhiteSpace(validationCode))
+                {
+                    var validation = await context.VoucherValidations.FirstAsync(v => v.VoucherId == entity.Id);
+                    if (validation != null)
+                        validation.ValidationCode = validationCode;
+                    else
+                        context.VoucherValidations.Add(
+                            new VoucherValidationEntity { ValidationCode = validationCode, VoucherId = entity.Id });
+                }
+
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<VoucherWithValidation> GetByShortCodeAsync(string shortCode)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var entity = await context.Vouchers
+                    .Where(v => v.ShortCode == shortCode)
+                    .Include(v => v.Validation)
+                    .FirstOrDefaultAsync();
+
+                return _mapper.Map<VoucherWithValidation>(entity);
             }
         }
 

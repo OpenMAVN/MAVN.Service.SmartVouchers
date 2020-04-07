@@ -22,9 +22,6 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
         /// <summary>Total vouchers count</summary>
         public int VouchersTotalCount { get; set; }
 
-        /// <summary>Bought vouchers count</summary>
-        public int BoughtVouchersCount { get; set; }
-
         /// <summary>Voucher price</summary>
         public decimal VoucherPrice { get; set; }
 

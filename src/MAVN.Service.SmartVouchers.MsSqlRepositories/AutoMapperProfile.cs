@@ -13,6 +13,11 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
             CreateMap<VoucherCampaignContent, VoucherCampaignContentEntity>(MemberList.Destination);
 
             CreateMap<Voucher, VoucherEntity>(MemberList.Source);
+
+            CreateMap<VoucherEntity, Voucher>(MemberList.Destination);
+
+            CreateMap<VoucherEntity, VoucherWithValidation>(MemberList.Destination)
+                .ForMember(e => e.ValidationCode, opt => opt.MapFrom(c => c.Validation.ValidationCode));
         }
     }
 }

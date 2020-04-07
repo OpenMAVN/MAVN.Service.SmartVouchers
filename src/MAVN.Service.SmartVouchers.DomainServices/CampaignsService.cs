@@ -50,11 +50,16 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return result;
         }
 
-        public async Task UpdateAsync(VoucherCampaign campaign)
+        public async Task<CampaignUpdateError> UpdateAsync(VoucherCampaign campaign)
         {
             var oldCampaign = await _campaignsRepository.GetByIdAsync(campaign.Id);
             if (oldCampaign == null)
-                throw new InvalidOperationException($"Campaign with id {campaign.Id} does not exist.");
+            {
+                _log.Error($"Campaign {campaign.Id} not found for update");
+                return CampaignUpdateError.VoucherCampaignNotFound;
+            }
+            if (campaign.VouchersTotalCount < oldCampaign.BoughtVouchersCount)
+                return CampaignUpdateError.TotalCountMustBeGreaterThanBoughtVouchersCount;
 
             campaign.CreatedBy = oldCampaign.CreatedBy;
             campaign.CreationDate = oldCampaign.CreationDate;
@@ -83,6 +88,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             await _campaignsRepository.UpdateAsync(campaign);
 
             _log.Info("Campaign was updated", context: campaign);
+
+            return CampaignUpdateError.None;
         }
 
         public async Task<bool> DeleteAsync(Guid campaignId)
