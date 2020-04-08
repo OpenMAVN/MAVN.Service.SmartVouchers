@@ -11,11 +11,11 @@ env:
   RELEASE_JOB: false
   RELEASE_SERVICE: true
   
-  CLIENT_PROJECT: ./client/MAVN.Service.WAMPHost.Client/MAVN.Service.WAMPHost.Client.csproj
-  CONTRACT_PROJECT: ./contract/MAVN.Service.WAMPHost.Contract/MAVN.Service.WAMPHost.Contract.csproj
+  CLIENT_PROJECT: ./client/MAVN.Service.SmartVouchers.Client/MAVN.Service.SmartVouchers.Client.csproj
+  CONTRACT_PROJECT: ./contract/MAVN.Service.SmartVouchers.Contract/MAVN.Service.SmartVouchers.Contract.csproj
   JOB_DOCKER_IMAGE:
   JOB_PROJECT:
-  SERVICE_DOCKER_IMAGE: smart-vouchers
+  SERVICE_DOCKER_IMAGE: smart-vouchers-service
   SERVICE_PROJECT: ./src/MAVN.Service.SmartVouchers/MAVN.Service.SmartVouchers.csproj
     
   
