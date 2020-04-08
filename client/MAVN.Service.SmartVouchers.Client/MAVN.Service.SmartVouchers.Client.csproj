@@ -1,18 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.1</Version>
-    <Authors>Lykke</Authors>
-    <Company>LykkeBisiness</Company>
-    <Product>Lykke.Service.SmartVouchers</Product>
-    <Description>Client for Lykke.Service.SmartVouchers API</Description>
-    <PackageLicenseUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers</PackageProjectUrl>
+    <Version>1.0.0</Version>
+    <Product>MAVN.Service.SmartVouchers</Product>
+    <Description>Client for MAVN.Service.SmartVouchers API</Description>
+    <PackageLicenseUrl>https://github.com/OpenMAVN/MAVN.Service.SmartVouchers/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/OpenMAVN/MAVN.Service.SmartVouchers</PackageProjectUrl>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/14153330?v=3&amp;s=200</PackageIconUrl>
-    <RepositoryUrl>https://github.com/LykkeBusinessPlatform/Lykke.Service.SmartVouchers.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/OpenMAVN/MAVN.Service.SmartVouchers.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>LykkeBiz;SmartVouchers</PackageTags>
-    <PackageId>LykkeBiz.Service.SmartVouchers</PackageId>
+    <PackageTags>MAVN;SmartVouchers</PackageTags>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
