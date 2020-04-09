@@ -1,4 +1,4 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 COPY . .
-ENTRYPOINT ["dotnet", "Lykke.Service.SmartVouchers.dll"]
+ENTRYPOINT ["dotnet", "MAVN.Service.SmartVouchers.dll"]
