@@ -7,15 +7,17 @@ namespace MAVN.Service.SmartVouchers.Client
     /// </summary>
     public class SmartVouchersClient : ISmartVouchersClient
     {
-        // Note: Add similar Api properties for each new service controller
+        /// <summary>Voucher campaigns Api interface</summary>
+        public IVoucherCampaignsApi CampaignsApi { get; }
 
-        /// <summary>Inerface to SmartVouchers Api.</summary>
-        public IVoucherCampaignsApi Api { get; private set; }
+        /// <summary>Vouchers Api interface</summary>
+        public ISmartVouchersApi VouchersApi { get; }
 
         /// <summary>C-tor</summary>
         public SmartVouchersClient(IHttpClientGenerator httpClientGenerator)
         {
-            Api = httpClientGenerator.Generate<IVoucherCampaignsApi>();
+            CampaignsApi = httpClientGenerator.Generate<IVoucherCampaignsApi>();
+            VouchersApi = httpClientGenerator.Generate<ISmartVouchersApi>();
         }
     }
 }
