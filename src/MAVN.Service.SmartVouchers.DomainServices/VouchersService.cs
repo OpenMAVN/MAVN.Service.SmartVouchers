@@ -129,6 +129,11 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 pageInfo.PageSize);
         }
 
+        public Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        {
+            return _vouchersRepository.GetPublishedAndActiveCampaignsVouchersCountAsync();
+        }
+
         private string GenerateShortCodeFromId(long voucherId)
         {
             var bytes = BitConverter.GetBytes(voucherId);
