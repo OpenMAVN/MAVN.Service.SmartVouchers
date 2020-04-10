@@ -13,5 +13,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
         Task<VoucherCampaign> GetByIdAsync(Guid campaignId);
         Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds);
         Task<CampaignsPage> GetCampaignsAsync(CampaignListRequest request);
+        Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)>
+            GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }

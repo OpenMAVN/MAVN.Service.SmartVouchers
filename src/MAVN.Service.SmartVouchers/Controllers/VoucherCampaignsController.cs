@@ -118,5 +118,22 @@ namespace MAVN.Service.SmartVouchers.Controllers
 
             return _mapper.Map<SaveImageErrorCodes>(error);
         }
+
+
+        /// <summary>
+        /// Get total count of vouchers for public and active voucher campaigns.
+        /// </summary>
+        [HttpGet("totalvouchers")]
+        [ProducesResponseType(typeof(PublishedAndActiveCampaignsVouchersCountResponse), (int)HttpStatusCode.OK)]
+        public async Task<PublishedAndActiveCampaignsVouchersCountResponse> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        {
+            var result = await _campaignsService.GetPublishedAndActiveCampaignsVouchersCountAsync();
+
+            return new PublishedAndActiveCampaignsVouchersCountResponse
+            {
+                ActiveCampaignsVouchersTotalCount = result.activeCampaingsVouchersCount,
+                PublishedCampaignsVouchersTotalCount = result.publishedCampaingsVouchersCount
+            };
+        }
     }
 }

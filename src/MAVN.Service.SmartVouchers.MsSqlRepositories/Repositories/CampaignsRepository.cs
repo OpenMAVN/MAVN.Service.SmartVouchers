@@ -122,5 +122,26 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 };
             }
         }
+
+        public async Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var now = DateTime.UtcNow;
+
+                var publishedCampaignsVouchersCount = await context.VoucherCampaigns
+                    .Where(c => c.State == CampaignState.Published)
+                    .Select(c => c.VouchersTotalCount)
+                    .SumAsync();
+
+                var activeCampaignsVouchersCount = await context.VoucherCampaigns
+                    .Where(c => c.State == CampaignState.Published && c.FromDate <= now &&
+                                (c.ToDate == null || c.ToDate > now))
+                    .Select(c => c.VouchersTotalCount)
+                    .SumAsync();
+
+                return (publishedCampaignsVouchersCount, activeCampaignsVouchersCount);
+            }
+        }
     }
 }

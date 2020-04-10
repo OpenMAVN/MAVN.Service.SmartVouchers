@@ -62,5 +62,12 @@ namespace MAVN.Service.SmartVouchers.Client
         /// <param name="model">The model that describes the file.</param>
         [Post("/api/campaigns/image")]
         Task<SaveImageErrorCodes> SetImage([Body] CampaignImageFileRequest model);
+
+
+        /// <summary>
+        /// Get total count of vouchers for public and active voucher campaigns.
+        /// </summary>
+        [Get("/api/campaigns/totalvouchers")]
+        Task<PublishedAndActiveCampaignsVouchersCountResponse> GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }
