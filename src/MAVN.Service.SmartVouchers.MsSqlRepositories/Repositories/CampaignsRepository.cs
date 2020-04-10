@@ -135,7 +135,8 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     .SumAsync();
 
                 var activeCampaignsVouchersCount = await context.VoucherCampaigns
-                    .Where(c => c.State == CampaignState.Published && c.FromDate <= now && c.ToDate > now)
+                    .Where(c => c.State == CampaignState.Published && c.FromDate <= now &&
+                                (c.ToDate == null || c.ToDate > now))
                     .Select(c => c.VouchersTotalCount)
                     .SumAsync();
 
