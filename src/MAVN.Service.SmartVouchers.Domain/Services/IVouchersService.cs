@@ -16,8 +16,5 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
         Task<VoucherWithValidation> GetByShortCodeAsync(string voucherShortCode);
         Task<VouchersPage> GetCustomerVouchersAsync(Guid customerId, PageInfo pageInfo);
         Task<VouchersPage> GetCampaignVouchersAsync(Guid campaignId, PageInfo pageInfo);
-
-        Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)>
-            GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }

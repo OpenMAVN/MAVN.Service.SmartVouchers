@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Lykke.Common.MsSql;
-using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
@@ -123,32 +122,6 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     Vouchers = _mapper.Map<List<Voucher>>(result),
                     TotalCount = totalCount,
                 };
-            }
-        }
-
-        public async Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
-        {
-            using (var context = _contextFactory.CreateDataContext())
-            {
-                var now = DateTime.UtcNow;
-
-                var publishedCampaignsIds = await context.VoucherCampaigns
-                    .Where(c => c.State == CampaignState.Published)
-                    .Select(c => c.Id)
-                    .ToArrayAsync();
-
-                var activeCampaignsIds = await context.VoucherCampaigns
-                    .Where(c => c.State == CampaignState.Published && c.FromDate <= now && c.ToDate > now)
-                    .Select(c => c.Id)
-                    .ToArrayAsync();
-
-                var publishedCampaignsVouchersCount =
-                    await context.Vouchers.CountAsync(v => publishedCampaignsIds.Contains(v.CampaignId));
-
-                var activeCampaignsVouchersCount =
-                    await context.Vouchers.CountAsync(v => activeCampaignsIds.Contains(v.CampaignId));
-
-                return (publishedCampaignsVouchersCount, activeCampaignsVouchersCount);
             }
         }
     }

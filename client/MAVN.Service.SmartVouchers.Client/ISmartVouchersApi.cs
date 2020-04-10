@@ -57,11 +57,5 @@ namespace MAVN.Service.SmartVouchers.Client
         /// <param name="pageData">Page data.</param>
         [Get("/api/vouchers/bycampaign")]
         Task<PaginatedVouchersListResponseModel> GetCampaignVouchersAsync(Guid campaignId, [Query] BasePaginationRequestModel pageData);
-
-        /// <summary>
-        /// Get total count of vouchers for public and active voucher campaigns.
-        /// </summary>
-        [Get("/api/vouchers/total")]
-        Task<PublishedAndActiveCampaignsVouchersCountResponse> GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }

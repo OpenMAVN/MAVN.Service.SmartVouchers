@@ -169,5 +169,11 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             return ImageSaveError.None;
         }
+
+
+        public Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        {
+            return _campaignsRepository.GetPublishedAndActiveCampaignsVouchersCountAsync();
+        }
     }
 }

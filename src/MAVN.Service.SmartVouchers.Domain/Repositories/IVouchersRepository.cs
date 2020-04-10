@@ -17,8 +17,5 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
             Guid ownerId,
             int skip,
             int take);
-
-        Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)>
-            GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }

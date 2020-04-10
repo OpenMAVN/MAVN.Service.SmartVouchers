@@ -15,5 +15,8 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
         Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds);
         Task<CampaignsPage> GetCampaignsAsync(CampaignListRequest request);
         Task<ImageSaveError> SaveCampaignContentImage(FileModel file);
+
+        Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)>
+            GetPublishedAndActiveCampaignsVouchersCountAsync();
     }
 }
