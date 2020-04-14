@@ -47,6 +47,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(VoucherDetailsResponseModel), (int)HttpStatusCode.OK)]
         public async Task<VoucherDetailsResponseModel> GetByShortCodeAsync(string voucherShortCode)
         {
+            if (string.IsNullOrWhiteSpace(voucherShortCode))
+                throw new ArgumentNullException();
+
             var result = await _vouchersService.GetByShortCodeAsync(voucherShortCode);
 
             return _mapper.Map<VoucherDetailsResponseModel>(result);
@@ -61,6 +64,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(PaginatedVouchersListResponseModel), (int)HttpStatusCode.OK)]
         public async Task<PaginatedVouchersListResponseModel> GetCampaignVouchersAsync(Guid campaignId, [FromQuery] BasePaginationRequestModel pageData)
         {
+            if (campaignId == default)
+                throw new ArgumentNullException(nameof(campaignId));
+
             var pageInfo = _mapper.Map<PageInfo>(pageData);
             var result = await _vouchersService.GetCampaignVouchersAsync(campaignId, pageInfo);
 
@@ -76,6 +82,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(PaginatedVouchersListResponseModel), (int)HttpStatusCode.OK)]
         public async Task<PaginatedVouchersListResponseModel> GetCustomerVouchersAsync(Guid customerId, [FromQuery] BasePaginationRequestModel pageData)
         {
+            if (customerId == default)
+                throw new ArgumentNullException(nameof(customerId));
+
             var pageInfo = _mapper.Map<PageInfo>(pageData);
             var result = await _vouchersService.GetCustomerVouchersAsync(customerId, pageInfo);
 

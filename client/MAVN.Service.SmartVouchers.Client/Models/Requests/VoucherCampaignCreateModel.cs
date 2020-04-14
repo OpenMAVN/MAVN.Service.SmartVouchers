@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using MAVN.Service.SmartVouchers.Client.Models.Enums;
 
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
@@ -36,9 +35,6 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 
         /// <summary>Voucher campaign's author</summary>
         public string CreatedBy { get; set; }
-
-        /// <summary>Voucher campaign state</summary>
-        public VoucherCampaignState State { get; set; }
 
         /// <summary>Voucher campaign contents</summary>
         public List<VoucherCampaignContentCreateModel> LocalizedContents { get; set; }

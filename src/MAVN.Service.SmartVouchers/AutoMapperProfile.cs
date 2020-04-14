@@ -2,6 +2,7 @@
 using AutoMapper;
 using MAVN.Service.SmartVouchers.Client.Models.Requests;
 using MAVN.Service.SmartVouchers.Client.Models.Responses;
+using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 
 namespace MAVN.Service.SmartVouchers
@@ -14,6 +15,7 @@ namespace MAVN.Service.SmartVouchers
             CreateMap<VoucherCampaignCreateModel, VoucherCampaign>(MemberList.Destination)
                 .ForMember(e => e.Id, opt => opt.MapFrom(c => Guid.NewGuid()))
                 .ForMember(e => e.BoughtVouchersCount, opt => opt.Ignore())
+                .ForMember(e => e.State, opt => opt.MapFrom(c => CampaignState.Draft))
                 .ForMember(e => e.CreationDate, opt => opt.Ignore());
             CreateMap<VoucherCampaignContentCreateModel, VoucherCampaignContent>(MemberList.Destination)
                 .ForMember(e => e.Language, opt => opt.MapFrom(c => c.Localization))

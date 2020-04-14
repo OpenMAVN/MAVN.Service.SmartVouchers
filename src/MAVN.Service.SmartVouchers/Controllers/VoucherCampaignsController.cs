@@ -55,6 +55,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public Task<bool> DeleteAsync(Guid campaignId)
         {
+            if (campaignId == default)
+                throw new ArgumentNullException();
+
             return _campaignsService.DeleteAsync(campaignId);
         }
 
@@ -85,6 +88,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(VoucherCampaignResponseModel), (int)HttpStatusCode.OK)]
         public async Task<VoucherCampaignDetailsResponseModel> GetByIdAsync(Guid campaignId)
         {
+            if (campaignId == default)
+                throw new ArgumentNullException();
+
             var campaign = await _campaignsService.GetByIdAsync(campaignId);
 
             var campaignModel = _mapper.Map<VoucherCampaignDetailsResponseModel>(campaign);
@@ -98,6 +104,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(VoucherCampaignsListResponseModel), (int)HttpStatusCode.OK)]
         public async Task<VoucherCampaignsListResponseModel> GetCampaignsByIds([FromQuery] Guid[] voicherCampaignsIds)
         {
+            if (voicherCampaignsIds == null || voicherCampaignsIds.Length == 0)
+                throw new ArgumentNullException();
+
             var campaigns = await _campaignsService.GetCampaignsByIdsAsync(voicherCampaignsIds);
 
             return new VoucherCampaignsListResponseModel

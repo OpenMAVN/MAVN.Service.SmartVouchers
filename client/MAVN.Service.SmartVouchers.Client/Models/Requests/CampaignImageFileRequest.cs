@@ -20,11 +20,9 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
         public Localization Localization { get; set; }
 
         /// <summary>Image file name</summary>
-
         public string Name { get; set; }
 
         /// <summary>Image file type</summary>
-
         public string Type { get; set; }
 
         /// <summary>Image file content</summary>
