@@ -9,12 +9,15 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
     /// Request model for voucher campaign editing
     /// </summary>
     [PublicAPI]
-    public class VoucherCampaignEditModel : VoucherCampaignCreateModel
+    public class VoucherCampaignEditModel : VoucherCampaignBase
     {
         /// <summary>Voucher campaign id</summary>
         public Guid Id { get; set; }
 
         /// <summary>Voucher campaign state</summary>
         public VoucherCampaignState State { get; set; }
+
+        /// <summary>Voucher campaign contents</summary>
+        public List<VoucherCampaignContentEditModel> LocalizedContents { get; set; }
     }
 }

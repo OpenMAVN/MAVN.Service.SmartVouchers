@@ -6,7 +6,7 @@ namespace MAVN.Service.SmartVouchers.Validation
 {
     [UsedImplicitly]
     public class VoucherCampaignModelValidatorBase<T> : AbstractValidator<T>
-        where T: VoucherCampaignCreateModel
+        where T: VoucherCampaignBase
     {
         public VoucherCampaignModelValidatorBase()
         {
@@ -21,10 +21,6 @@ namespace MAVN.Service.SmartVouchers.Validation
             RuleFor(x => x.PartnerId)
                 .NotEmpty()
                 .WithMessage(x => $"{nameof(x.PartnerId)} required");
-
-            RuleFor(x => x.CreatedBy)
-                .NotEmpty()
-                .WithMessage(x => $"{nameof(x.CreatedBy)} required");
 
             RuleFor(x => x.VouchersTotalCount)
                 .Must(x => x > 0)
