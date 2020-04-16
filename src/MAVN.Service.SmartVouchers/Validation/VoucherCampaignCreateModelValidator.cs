@@ -9,7 +9,6 @@ namespace MAVN.Service.SmartVouchers.Validation
     {
         public VoucherCampaignCreateModelValidator()
         {
-
             RuleFor(x => x.CreatedBy)
                 .NotEmpty()
                 .WithMessage(x => $"{nameof(x.CreatedBy)} required");
