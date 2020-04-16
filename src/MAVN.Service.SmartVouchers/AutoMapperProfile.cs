@@ -25,6 +25,7 @@ namespace MAVN.Service.SmartVouchers
 
             CreateMap<VoucherCampaignEditModel, VoucherCampaign>(MemberList.Destination)
                 .ForMember(e => e.BoughtVouchersCount, opt => opt.Ignore())
+                .ForMember(e => e.CreatedBy, opt => opt.Ignore())
                 .ForMember(e => e.CreationDate, opt => opt.Ignore());
             CreateMap<VoucherCampaignContentEditModel, VoucherCampaignContent>(MemberList.Destination)
                 .ForMember(e => e.Language, opt => opt.MapFrom(c => c.Localization))
