@@ -109,6 +109,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 }
 
                 var result = await query
+                    .OrderByDescending(i => i.CreatedBy)
                     .Skip(request.Skip)
                     .Take(request.Take)
                     .ToListAsync();
