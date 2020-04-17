@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using MAVN.Service.SmartVouchers.AzureRepositories.Entities;
 using MAVN.Service.SmartVouchers.Client.Models.Requests;
 using MAVN.Service.SmartVouchers.Client.Models.Responses;
 using MAVN.Service.SmartVouchers.Domain.Enums;
@@ -50,6 +51,13 @@ namespace MAVN.Service.SmartVouchers
             CreateMap<Voucher, VoucherResponseModel>(MemberList.Destination);
 
             CreateMap<BasePaginationRequestModel, PageInfo>(MemberList.Destination);
+
+            CreateMap<FileModel, FileInfoEntity>(MemberList.Destination)
+                .ForMember(e => e.CampaignContentId, opt => opt.MapFrom(c => c.Id))
+                .ForMember(e => e.ETag, opt => opt.Ignore())
+                .ForMember(e => e.PartitionKey, opt => opt.Ignore())
+                .ForMember(e => e.RowKey, opt => opt.Ignore())
+                .ForMember(e => e.Timestamp, opt => opt.Ignore());
         }
     }
 }
