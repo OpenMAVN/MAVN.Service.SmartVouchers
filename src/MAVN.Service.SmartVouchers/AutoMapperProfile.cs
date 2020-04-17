@@ -58,6 +58,12 @@ namespace MAVN.Service.SmartVouchers
                 .ForMember(e => e.PartitionKey, opt => opt.Ignore())
                 .ForMember(e => e.RowKey, opt => opt.Ignore())
                 .ForMember(e => e.Timestamp, opt => opt.Ignore());
+
+            CreateMap<FileInfoEntity, FileModel>(MemberList.Destination)
+                .ForMember(e => e.Id, opt => opt.MapFrom(c => c.CampaignContentId))
+                .ForMember(e => e.CampaignId, opt => opt.Ignore())
+                .ForMember(e => e.Content, opt => opt.Ignore())
+                .ForMember(e => e.Language, opt => opt.Ignore());
         }
     }
 }
