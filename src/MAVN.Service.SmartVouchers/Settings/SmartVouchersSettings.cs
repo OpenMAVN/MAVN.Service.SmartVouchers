@@ -9,5 +9,8 @@ namespace MAVN.Service.SmartVouchers.Settings
         public DbSettings Db { get; set; }
 
         public RabbitMqSettings Rabbit { get; set; }
+
+        public RedisSettings Redis { set; get; }
+        public string LockTimeOut { get; set; }
     }
 }

@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="Lykke.RabbitMqBroker" Version="7.13.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.1.30" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\contract\MAVN.Service.SmartVouchers.Contract\MAVN.Service.SmartVouchers.Contract.csproj" />

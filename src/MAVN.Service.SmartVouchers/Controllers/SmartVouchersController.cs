@@ -31,12 +31,39 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// </summary>
         /// <param name="model">The model that describes voucher buy request.</param>
         [HttpPost]
-        [ProducesResponseType(typeof(BuyVoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<BuyVoucherErrorCodes> BuyVoucherAsync([FromBody] VoucherBuyModel model)
+        [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<ProcessingVoucherErrorCodes> BuyVoucherAsync([FromBody] VoucherProcessingModel model)
         {
             var result = await _vouchersService.BuyVoucherAsync(model.VoucherCampaignId, model.CustomerId);
 
-            return _mapper.Map<BuyVoucherErrorCodes>(result);
+            return _mapper.Map<ProcessingVoucherErrorCodes>(result);
+        }
+
+        /// <summary>
+        /// Reserve a new voucher from passed voucher campaign.
+        /// </summary>
+        /// <param name="model">The model that describes voucher reserve request.</param>
+        [HttpPost("reserve")]
+        [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<ProcessingVoucherErrorCodes> ReserveVoucherAsync([FromBody] VoucherProcessingModel model)
+        {
+            var result = await _vouchersService.ReserveVoucherAsync(model.VoucherCampaignId, model.CustomerId);
+
+            return _mapper.Map<ProcessingVoucherErrorCodes>(result);
+        }
+
+        /// <summary>
+        /// Cancel voucher reservation.
+        /// </summary>
+        /// <param name="model">The model that describes voucher canceling reservation request.</param>
+        /// <returns></returns>
+        [HttpPost("cancelReservation")]
+        [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
+        public async Task<ProcessingVoucherErrorCodes> CancelVoucherReservationAsync([FromBody] VoucherCancelReservationModel model)
+        {
+            var result = await _vouchersService.CancelVoucherReservationAsync(model.ShortCode);
+
+            return _mapper.Map<ProcessingVoucherErrorCodes>(result);
         }
 
         /// <summary>

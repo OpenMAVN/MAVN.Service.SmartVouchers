@@ -3,7 +3,7 @@
     /// <summary>
     /// Buy voucher error codes
     /// </summary>
-    public enum BuyVoucherErrorCodes
+    public enum ProcessingVoucherErrorCodes
     {
         /// <summary>No error code</summary>
         None = 0,
