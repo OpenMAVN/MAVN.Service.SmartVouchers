@@ -1,7 +1,7 @@
 ﻿namespace MAVN.Service.SmartVouchers.Client.Models.Responses.Enums
 {
     /// <summary>
-    /// Buy voucher error codes
+    /// Processing voucher error codes
     /// </summary>
     public enum ProcessingVoucherErrorCodes
     {
