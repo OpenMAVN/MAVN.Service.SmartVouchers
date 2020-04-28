@@ -14,11 +14,11 @@ namespace MAVN.Service.SmartVouchers.Modules
     [UsedImplicitly]
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<AppSettings> _appSettings;
+        private readonly SmartVouchersSettings _settings;
 
         public ServiceModule(IReloadingManager<AppSettings> appSettings)
         {
-            _appSettings = appSettings;
+            _settings = appSettings.CurrentValue.SmartVouchersService;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -40,7 +40,7 @@ namespace MAVN.Service.SmartVouchers.Modules
 
             builder.RegisterType<VouchersService>()
                 .As<IVouchersService>()
-                .WithParameter("lockTimeOut", _appSettings.CurrentValue.SmartVouchersService.LockTimeOut)
+                .WithParameter(TypedParameter.From(_settings.VoucherLockTimeOut))
                 .AutoActivate()
                 .SingleInstance();
 
@@ -56,7 +56,7 @@ namespace MAVN.Service.SmartVouchers.Modules
 
             builder.Register(context =>
             {
-                var connectionMultiplexer = ConnectionMultiplexer.Connect(_appSettings.CurrentValue.SmartVouchersService.Redis.ConnectionString);
+                var connectionMultiplexer = ConnectionMultiplexer.Connect(_settings.Redis.ConnectionString);
                 connectionMultiplexer.IncludeDetailInExceptions = false;
                 return connectionMultiplexer;
             }).As<IConnectionMultiplexer>().SingleInstance();

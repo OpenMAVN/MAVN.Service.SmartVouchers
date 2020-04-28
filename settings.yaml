@@ -24,8 +24,8 @@ SmartVouchersService:
   Redis:
     ConnectionString:
       settings-key: SmartVouchersService-Redis-ConnectionString
-  LockTimeOut:
-    settings-key: ThreadLockTimeOut
+  VoucherLockTimeOut:
+    settings-key: SmartVouchersService-VoucherLockTimeOut
 SlackNotifications:
     AzureQueue:
         ConnectionString:

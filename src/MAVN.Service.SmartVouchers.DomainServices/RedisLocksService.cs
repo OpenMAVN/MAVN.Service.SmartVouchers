@@ -14,9 +14,9 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _db = connectionMultiplexer.GetDatabase();
         }
 
-        public Task<bool> TryAcquireLockAsync(string key, string token)
+        public Task<bool> TryAcquireLockAsync(string key, string token, TimeSpan ttl)
         {
-            return _db.LockTakeAsync(key, token, TimeSpan.FromHours(1));
+            return _db.LockTakeAsync(key, token, ttl);
         }
 
         public Task<bool> ReleaseLockAsync(string key, string token)

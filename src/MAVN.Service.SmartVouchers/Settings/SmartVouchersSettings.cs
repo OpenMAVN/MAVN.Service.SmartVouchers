@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Lykke.SettingsReader.Attributes;
 
 namespace MAVN.Service.SmartVouchers.Settings
@@ -11,6 +12,7 @@ namespace MAVN.Service.SmartVouchers.Settings
         public RabbitMqSettings Rabbit { get; set; }
 
         public RedisSettings Redis { set; get; }
-        public string LockTimeOut { get; set; }
+
+        public TimeSpan VoucherLockTimeOut { get; set; }
     }
 }
