@@ -12,7 +12,8 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
         Task ReserveAsync(Voucher voucher);
         Task CancelReservationAsync(Voucher voucher);
         Task UpdateAsync(Voucher voucher, string validationCode = null);
-        Task<VoucherWithValidation> GetByShortCodeAsync(string shortCode);
+        Task<VoucherWithValidation> GetWithValidationByShortCodeAsync(string shortCode);
+        Task<Voucher> GetByShortCodeAsync(string shortCode);
         Task<VouchersPage> GetByCampaignIdAsync(
             Guid campaignId,
             int skip,
@@ -22,6 +23,5 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
             int skip,
             int take);
         Task<List<Voucher>> GetByCampaignIdAndStatusAsync(Guid campaignId, VoucherStatus status);
-        Task<Voucher> GetReservedByCampaignIdAndOwnerAsync(Guid campaignId, Guid owner);
     }
 }

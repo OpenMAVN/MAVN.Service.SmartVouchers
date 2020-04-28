@@ -31,12 +31,12 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// </summary>
         /// <param name="model">The model that describes voucher reserve request.</param>
         [HttpPost("reserve")]
-        [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<ProcessingVoucherErrorCodes> ReserveVoucherAsync([FromBody] VoucherProcessingModel model)
+        [ProducesResponseType(typeof(ReserveVoucherResponse), (int)HttpStatusCode.OK)]
+        public async Task<ReserveVoucherResponse> ReserveVoucherAsync([FromBody] VoucherProcessingModel model)
         {
             var result = await _vouchersService.ReserveVoucherAsync(model.VoucherCampaignId, model.CustomerId);
 
-            return _mapper.Map<ProcessingVoucherErrorCodes>(result);
+            return _mapper.Map<ReserveVoucherResponse>(result);
         }
 
         /// <summary>

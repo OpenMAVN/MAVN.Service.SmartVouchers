@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Log;
+using MAVN.Service.PaymentManagement.Client;
+using MAVN.Service.PaymentManagement.Client.Models.Requests;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
@@ -16,38 +18,37 @@ namespace MAVN.Service.SmartVouchers.DomainServices
     {
         private const int MaxAttemptsCount = 5;
 
+        private readonly IPaymentManagementClient _paymentManagementClient;
         private readonly IVouchersRepository _vouchersRepository;
         private readonly ICampaignsRepository _campaignsRepository;
+        private readonly IPaymentRequestsRepository _paymentRequestsRepository;
         private readonly IRedisLocksService _redisLocksService;
         private readonly ILog _log;
         private readonly TimeSpan _lockTimeOut;
 
         public VouchersService(
+            IPaymentManagementClient paymentManagementClient,
             IVouchersRepository vouchersRepository,
             ICampaignsRepository campaignsRepository,
+            IPaymentRequestsRepository paymentRequestsRepository,
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
             TimeSpan lockTimeOut)
         {
+            _paymentManagementClient = paymentManagementClient;
             _vouchersRepository = vouchersRepository;
             _campaignsRepository = campaignsRepository;
+            _paymentRequestsRepository = paymentRequestsRepository;
             _redisLocksService = redisLocksService;
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
         }
 
-        public async Task<ProcessingVoucherError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId)
+        public async Task<ProcessingVoucherError> ProcessPaymentRequestAsync(Guid paymentRequestId)
         {
-            var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
-            if (campaign == null)
-                return ProcessingVoucherError.VoucherCampaignNotFound;
+            var voucherShortCode = await _paymentRequestsRepository.GetVoucherShortCodeAsync(paymentRequestId);
 
-            if (campaign.State != CampaignState.Published
-                || DateTime.UtcNow < campaign.FromDate
-                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
-                return ProcessingVoucherError.VoucherCampaignNotActive;
-
-            var voucher = await _vouchersRepository.GetReservedByCampaignIdAndOwnerAsync(voucherCampaignId, ownerId);
+            var voucher = await _vouchersRepository.GetByShortCodeAsync(voucherShortCode);
             if (voucher != null)
                 return ProcessingVoucherError.VoucherNotFound;
 
@@ -57,19 +58,19 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return ProcessingVoucherError.None;
         }
 
-        public async Task<ProcessingVoucherError> ReserveVoucherAsync(Guid voucherCampaignId, Guid ownerId)
+        public async Task<VoucherReservationResult> ReserveVoucherAsync(Guid voucherCampaignId, Guid ownerId)
         {
             var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
             if (campaign == null)
-                return ProcessingVoucherError.VoucherCampaignNotFound;
+                return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.VoucherCampaignNotFound };
 
             if (campaign.State != CampaignState.Published
                 || DateTime.UtcNow < campaign.FromDate
                 || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
-                return ProcessingVoucherError.VoucherCampaignNotActive;
+                return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.VoucherCampaignNotActive };
 
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
-                return ProcessingVoucherError.NoAvailableVouchers;
+                return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
 
             var voucherCampaignIdStr = voucherCampaignId.ToString();
             for (int i = 0; i < MaxAttemptsCount; ++i)
@@ -85,11 +86,12 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 }
 
                 var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
+                Voucher voucher = null;
                 if (vouchers.Any())
                 {
                     try
                     {
-                        var voucher = vouchers.FirstOrDefault();
+                        voucher = vouchers.FirstOrDefault();
                         voucher.OwnerId = ownerId;
                         voucher.Status = VoucherStatus.Reserved;
                         await _vouchersRepository.ReserveAsync(voucher);
@@ -98,7 +100,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     {
                         _log.Error(e);
                         await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-                        return ProcessingVoucherError.NoAvailableVouchers;
+                        return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
                     }
                 }
                 else
@@ -107,11 +109,11 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     if (vouchersPage.TotalCount >= campaign.VouchersTotalCount)
                     {
                         await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-                        return ProcessingVoucherError.NoAvailableVouchers;
+                        return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
                     }
 
                     var (validationCode, hash) = GenerateValidation();
-                    var voucher = new Voucher
+                    voucher = new Voucher
                     {
                         CampaignId = voucherCampaignId,
                         Status = VoucherStatus.Reserved,
@@ -127,12 +129,28 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 }
 
                 await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-                return ProcessingVoucherError.None;
+
+                var paymentRequestResult = await _paymentManagementClient.Api.GeneratePaymentAsync(
+                    new PaymentGenerationRequest
+                    {
+                        CustomerId = ownerId,
+                        Amount = campaign.VoucherPrice,
+                        Currency = campaign.Currency,
+                        PartnerId = campaign.PartnerId,
+                    });
+
+                await _paymentRequestsRepository.CreatePaymentRequestAsync(paymentRequestResult.PaymentRequestId, voucher.ShortCode);
+
+                return new VoucherReservationResult
+                {
+                    ErrorCode = ProcessingVoucherError.None,
+                    PaymentUrl = paymentRequestResult.PaymentPageUrl,
+                };
             }
 
             _log.Warning($"Couldn't get a lock for voucher campaign {voucherCampaignId}");
 
-            return ProcessingVoucherError.NoAvailableVouchers;
+            return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
         }
 
         public async Task<ProcessingVoucherError> CancelVoucherReservationAsync(string shortCode)
@@ -165,7 +183,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode)
         {
-            var voucher = await _vouchersRepository.GetByShortCodeAsync(voucherShortCode);
+            var voucher = await _vouchersRepository.GetWithValidationByShortCodeAsync(voucherShortCode);
             if (voucher == null)
                 return RedeemVoucherError.VoucherNotFound;
 
@@ -214,7 +232,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public Task<VoucherWithValidation> GetByShortCodeAsync(string voucherShortCode)
         {
-            return _vouchersRepository.GetByShortCodeAsync(voucherShortCode);
+            return _vouchersRepository.GetWithValidationByShortCodeAsync(voucherShortCode);
         }
 
         public Task<VouchersPage> GetCampaignVouchersAsync(Guid campaignId, PageInfo pageInfo)

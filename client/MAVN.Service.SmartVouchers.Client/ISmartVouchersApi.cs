@@ -19,7 +19,7 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         /// <param name="model">The model that describes voucher reserve request.</param>
         [Post("/api/vouchers/reserve")]
-        Task<ProcessingVoucherErrorCodes> ReserveVoucherAsync([Body] VoucherProcessingModel model);
+        Task<ReserveVoucherResponse> ReserveVoucherAsync([Body] VoucherProcessingModel model);
 
         /// <summary>
         /// Cancel voucher reservation.

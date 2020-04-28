@@ -37,4 +37,6 @@ SlackNotifications:
 MonitoringServiceClient:
     MonitoringServiceUrl:
         settings-key: MonitoringServiceUrl
-
+PaymentManagementServiceClient:
+    ServiceUrl:
+        settings-key: PaymentManagementServiceUrl

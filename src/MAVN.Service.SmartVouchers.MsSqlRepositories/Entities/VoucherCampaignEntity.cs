@@ -35,7 +35,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Entities
 
         [Column("partner_id")]
         [Required]
-        public string PartnerId { get; set; }
+        public Guid PartnerId { get; set; }
 
         [Column("from_date")]
         public DateTime FromDate { get; set; }

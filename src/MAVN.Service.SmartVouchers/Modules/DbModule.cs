@@ -43,6 +43,10 @@ namespace MAVN.Service.SmartVouchers.Modules
                 .As<ICampaignContentsRepository>()
                 .SingleInstance();
 
+            builder.RegisterType<PaymentRequestsRepository>()
+                .As<IPaymentRequestsRepository>()
+                .SingleInstance();
+
             builder.RegisterMsSql(
                 _connectionString,
                 connString => new SmartVouchersContext(connString, false),

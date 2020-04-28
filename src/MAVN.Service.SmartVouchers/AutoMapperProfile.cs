@@ -64,6 +64,8 @@ namespace MAVN.Service.SmartVouchers
                 .ForMember(e => e.CampaignId, opt => opt.Ignore())
                 .ForMember(e => e.Content, opt => opt.Ignore())
                 .ForMember(e => e.Language, opt => opt.Ignore());
+
+            CreateMap<VoucherReservationResult, ReserveVoucherResponse>(MemberList.Destination);
         }
     }
 }

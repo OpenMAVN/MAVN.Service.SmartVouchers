@@ -2,9 +2,10 @@
 using JetBrains.Annotations;
 using Lykke.Sdk;
 using Lykke.Sdk.Health;
+using Lykke.SettingsReader;
+using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.SmartVouchers.Services;
 using MAVN.Service.SmartVouchers.Settings;
-using Lykke.SettingsReader;
 using MAVN.Service.SmartVouchers.DomainServices;
 using MAVN.Service.SmartVouchers.Domain.Services;
 using StackExchange.Redis;
@@ -14,11 +15,11 @@ namespace MAVN.Service.SmartVouchers.Modules
     [UsedImplicitly]
     public class ServiceModule : Module
     {
-        private readonly SmartVouchersSettings _settings;
+        private readonly AppSettings _settings;
 
         public ServiceModule(IReloadingManager<AppSettings> appSettings)
         {
-            _settings = appSettings.CurrentValue.SmartVouchersService;
+            _settings = appSettings.CurrentValue;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -40,7 +41,7 @@ namespace MAVN.Service.SmartVouchers.Modules
 
             builder.RegisterType<VouchersService>()
                 .As<IVouchersService>()
-                .WithParameter(TypedParameter.From(_settings.VoucherLockTimeOut))
+                .WithParameter(TypedParameter.From(_settings.SmartVouchersService.VoucherLockTimeOut))
                 .AutoActivate()
                 .SingleInstance();
 
@@ -56,7 +57,7 @@ namespace MAVN.Service.SmartVouchers.Modules
 
             builder.Register(context =>
             {
-                var connectionMultiplexer = ConnectionMultiplexer.Connect(_settings.Redis.ConnectionString);
+                var connectionMultiplexer = ConnectionMultiplexer.Connect(_settings.SmartVouchersService.Redis.ConnectionString);
                 connectionMultiplexer.IncludeDetailInExceptions = false;
                 return connectionMultiplexer;
             }).As<IConnectionMultiplexer>().SingleInstance();
@@ -64,6 +65,8 @@ namespace MAVN.Service.SmartVouchers.Modules
             builder.RegisterType<RedisLocksService>()
                 .As<IRedisLocksService>()
                 .SingleInstance();
+
+            builder.RegisterPaymentManagementClient(_settings.PaymentManagementServiceClient, null);
         }
     }
 }

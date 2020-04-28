@@ -32,7 +32,7 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Responses
         public string Currency { get; set; }
 
         /// <summary>Voucher campaign issuer</summary>
-        public string PartnerId { get; set; }
+        public Guid PartnerId { get; set; }
 
         /// <summary>Voucher campaign start date</summary>
         public DateTime FromDate { get; set; }

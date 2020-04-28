@@ -13,7 +13,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public int BoughtVouchersCount { get; set; }
         public decimal VoucherPrice { get; set; }
         public string Currency { get; set; }
-        public string PartnerId { get; set; }
+        public Guid PartnerId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public DateTime CreationDate { get; set; }
