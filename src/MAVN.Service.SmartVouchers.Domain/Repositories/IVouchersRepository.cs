@@ -22,5 +22,6 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
             int skip,
             int take);
         Task<List<Voucher>> GetByCampaignIdAndStatusAsync(Guid campaignId, VoucherStatus status);
+        Task<Voucher> GetReservedByCampaignIdAndOwnerAsync(Guid campaignId, Guid owner);
     }
 }

@@ -47,26 +47,12 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
                 return ProcessingVoucherError.VoucherCampaignNotActive;
 
-            if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
-                return ProcessingVoucherError.NoAvailableVouchers;
+            var voucher = await _vouchersRepository.GetReservedByCampaignIdAndOwnerAsync(voucherCampaignId, ownerId);
+            if (voucher != null)
+                return ProcessingVoucherError.VoucherNotFound;
 
-            var (validationCode, hash) = GenerateValidation();
-            var voucher = new Voucher
-            {
-                CampaignId = voucherCampaignId,
-                Status = VoucherStatus.InStock,
-                ValidationCodeHash = hash,
-                OwnerId = ownerId,
-                PurchaseDate = DateTime.UtcNow,
-            };
-
-            voucher.Id = await _vouchersRepository.CreateAsync(voucher);
-            voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
-
-            await _vouchersRepository.UpdateAsync(voucher, validationCode);
-
-            campaign.BoughtVouchersCount++;
-            await _campaignsRepository.UpdateAsync(campaign);
+            voucher.Status = VoucherStatus.Sold;
+            await _vouchersRepository.UpdateAsync(voucher);
 
             return ProcessingVoucherError.None;
         }
@@ -166,6 +152,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             {
                 while (true)
                 {
+                    await Task.Delay(_lockTimeOut);
+
                     var result = await CancelReservationAsync(shortCode);
                     if (result != null)
                         break;
@@ -267,10 +255,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             var locked = await _redisLocksService.TryAcquireLockAsync(shortCode, shortCode, _lockTimeOut);
             if (!locked)
-            {
-                await Task.Delay(_lockTimeOut);
                 return null;
-            }
 
             var voucher = await _vouchersRepository.GetByShortCodeAsync(shortCode);
             if (voucher.Status != VoucherStatus.Reserved)

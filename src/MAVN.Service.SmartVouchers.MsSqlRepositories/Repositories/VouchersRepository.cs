@@ -168,5 +168,17 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 return _mapper.Map<List<Voucher>>(result);
             }
         }
+
+        public async Task<Voucher> GetReservedByCampaignIdAndOwnerAsync(Guid campaignId, Guid owner)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var result = await context.Vouchers.FirstOrDefaultAsync(v =>
+                    v.CampaignId == campaignId
+                    && v.Status == VoucherStatus.Reserved
+                    && v.OwnerId == owner);
+                return _mapper.Map<Voucher>(result);
+            }
+        }
     }
 }
