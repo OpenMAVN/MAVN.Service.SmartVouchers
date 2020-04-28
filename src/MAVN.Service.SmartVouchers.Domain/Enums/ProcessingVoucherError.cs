@@ -1,10 +1,11 @@
 ﻿namespace MAVN.Service.SmartVouchers.Domain.Enums
 {
-    public enum BuyVoucherError
+    public enum ProcessingVoucherError
     {
         None = 0,
         VoucherCampaignNotFound,
         VoucherCampaignNotActive,
         NoAvailableVouchers,
+        VoucherNotFound,
     }
 }

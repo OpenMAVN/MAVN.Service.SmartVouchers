@@ -19,7 +19,7 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         /// <param name="model">The model that describes voucher buy request.</param>
         [Post("/api/vouchers")]
-        Task<BuyVoucherErrorCodes> BuyVoucherAsync([Body] VoucherBuyModel model);
+        Task<ProcessingVoucherErrorCodes> BuyVoucherAsync([Body] VoucherProcessingModel model);
 
         /// <summary>
         /// Redeem a voucher.

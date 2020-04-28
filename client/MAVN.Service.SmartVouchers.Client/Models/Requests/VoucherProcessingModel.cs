@@ -4,10 +4,10 @@ using JetBrains.Annotations;
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
     /// <summary>
-    /// Request model for smart voucher buying.
+    /// Request model for smart voucher processing.
     /// </summary>
     [PublicAPI]
-    public class VoucherBuyModel
+    public class VoucherProcessingModel
     {
         /// <summary>
         /// Voucher campaign id

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Log;
@@ -15,31 +17,37 @@ namespace MAVN.Service.SmartVouchers.DomainServices
     {
         private readonly IVouchersRepository _vouchersRepository;
         private readonly ICampaignsRepository _campaignsRepository;
+        private readonly IRedisLocksService _redisLocksService;
         private readonly ILog _log;
+        private readonly string _lockTimeOut;
 
         public VouchersService(
             IVouchersRepository vouchersRepository,
             ICampaignsRepository campaignsRepository,
-            ILogFactory logFactory)
+            ILogFactory logFactory,
+            IRedisLocksService redisLocksService,
+            string lockTimeOut)
         {
             _vouchersRepository = vouchersRepository;
             _campaignsRepository = campaignsRepository;
+            _redisLocksService = redisLocksService;
             _log = logFactory.CreateLog(this);
+            _lockTimeOut = lockTimeOut;
         }
 
-        public async Task<BuyVoucherError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId)
+        public async Task<ProcessingVoucherError> BuyVoucherAsync(Guid voucherCampaignId, Guid ownerId)
         {
             var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
             if (campaign == null)
-                return BuyVoucherError.VoucherCampaignNotFound;
+                return ProcessingVoucherError.VoucherCampaignNotFound;
 
             if (campaign.State != CampaignState.Published
                 || DateTime.UtcNow < campaign.FromDate
                 || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
-                return BuyVoucherError.VoucherCampaignNotActive;
+                return ProcessingVoucherError.VoucherCampaignNotActive;
 
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
-                return BuyVoucherError.NoAvailableVouchers;
+                return ProcessingVoucherError.NoAvailableVouchers;
 
             var (validationCode, hash) = GenerateValidation();
             var voucher = new Voucher
@@ -56,7 +64,110 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             await _vouchersRepository.UpdateAsync(voucher, validationCode);
 
-            return BuyVoucherError.None;
+            campaign.BoughtVouchersCount++;
+            await _campaignsRepository.UpdateAsync(campaign);
+
+            return ProcessingVoucherError.None;
+        }
+
+        public async Task<ProcessingVoucherError> ReserveVoucherAsync(Guid voucherCampaignId, Guid ownerId)
+        {
+            while (true)
+            {
+                var locked = await _redisLocksService.TryAcquireLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                if (!locked)
+                {
+                    Thread.Sleep(int.Parse(_lockTimeOut));
+                    continue;
+                }
+
+                var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
+                if (campaign == null)
+                {
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                    return ProcessingVoucherError.VoucherCampaignNotFound;
+                }
+
+                if (campaign.State != CampaignState.Published
+                    || DateTime.UtcNow < campaign.FromDate
+                    || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+                {
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                    return ProcessingVoucherError.VoucherCampaignNotActive;
+                }
+
+                if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
+                {
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                    return ProcessingVoucherError.NoAvailableVouchers;
+                }
+
+                var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
+                if (vouchers.Any())
+                {
+                    try
+                    {
+                        var voucher = vouchers.FirstOrDefault();
+                        voucher.OwnerId = ownerId;
+                        voucher.Status = VoucherStatus.Reserved;
+                        await _vouchersRepository.ReserveAsync(voucher);
+                    }
+                    catch (Exception)
+                    {
+                        await _redisLocksService.ReleaseLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                        return ProcessingVoucherError.NoAvailableVouchers;
+                    }
+                }
+                else
+                {
+                    var (validationCode, hash) = GenerateValidation();
+                    var voucher = new Voucher
+                    {
+                        CampaignId = voucherCampaignId,
+                        Status = VoucherStatus.Reserved,
+                        ValidationCodeHash = hash,
+                        OwnerId = ownerId,
+                        PurchaseDate = DateTime.UtcNow,
+                    };
+
+                    voucher.Id = await _vouchersRepository.CreateAsync(voucher);
+                    voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
+
+                    await _vouchersRepository.UpdateAsync(voucher, validationCode);
+                }
+
+                await _redisLocksService.ReleaseLockAsync(voucherCampaignId.ToString(), ownerId.ToString());
+                return ProcessingVoucherError.None;
+            }
+        }
+
+        public async Task<ProcessingVoucherError> CancelVoucherReservationAsync(string shortCode)
+        {
+            while (true)
+            {
+                var locked = await _redisLocksService.TryAcquireLockAsync(shortCode, shortCode);
+                if (!locked)
+                {
+                    Thread.Sleep(int.Parse(_lockTimeOut));
+                    continue;
+                }
+
+                var voucher = await _vouchersRepository.GetByShortCodeAsync(shortCode);
+                if (voucher == null)
+                {
+                    await _redisLocksService.ReleaseLockAsync(shortCode, shortCode);
+                    return ProcessingVoucherError.VoucherNotFound;
+                }
+
+                if (voucher.Status == VoucherStatus.Reserved)
+                {
+                    voucher.Status = VoucherStatus.InStock;
+                    await _vouchersRepository.CancelReservationAsync(voucher);
+                }
+
+                await _redisLocksService.ReleaseLockAsync(shortCode, shortCode);
+                return ProcessingVoucherError.None;
+            }
         }
 
         public async Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode)

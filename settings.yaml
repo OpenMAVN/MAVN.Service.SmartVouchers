@@ -21,6 +21,11 @@ SmartVouchersService:
         settings-key: WalletManagementRabbitMQ
         types:
           - RabbitMq
+  Redis:
+    ConnectionString:
+      settings-key: SmartVouchersService-Redis-ConnectionString
+  LockTimeOut:
+    settings-key: ThreadLockTimeOut
 SlackNotifications:
     AzureQueue:
         ConnectionString:

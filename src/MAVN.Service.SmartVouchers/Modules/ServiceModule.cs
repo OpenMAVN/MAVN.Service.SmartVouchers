@@ -7,6 +7,7 @@ using MAVN.Service.SmartVouchers.Settings;
 using Lykke.SettingsReader;
 using MAVN.Service.SmartVouchers.DomainServices;
 using MAVN.Service.SmartVouchers.Domain.Services;
+using StackExchange.Redis;
 
 namespace MAVN.Service.SmartVouchers.Modules
 {
@@ -39,6 +40,7 @@ namespace MAVN.Service.SmartVouchers.Modules
 
             builder.RegisterType<VouchersService>()
                 .As<IVouchersService>()
+                .WithParameter("lockTimeOut", _appSettings.CurrentValue.SmartVouchersService.LockTimeOut)
                 .AutoActivate()
                 .SingleInstance();
 
@@ -50,6 +52,17 @@ namespace MAVN.Service.SmartVouchers.Modules
             builder.RegisterType<FileService>()
                 .As<IFileService>()
                 .AutoActivate()
+                .SingleInstance();
+
+            builder.Register(context =>
+            {
+                var connectionMultiplexer = ConnectionMultiplexer.Connect(_appSettings.CurrentValue.SmartVouchersService.Redis.ConnectionString);
+                connectionMultiplexer.IncludeDetailInExceptions = false;
+                return connectionMultiplexer;
+            }).As<IConnectionMultiplexer>().SingleInstance();
+
+            builder.RegisterType<RedisLocksService>()
+                .As<IRedisLocksService>()
                 .SingleInstance();
         }
     }

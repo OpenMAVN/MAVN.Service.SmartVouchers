@@ -5,7 +5,7 @@ using MAVN.Service.SmartVouchers.Client.Models.Requests;
 namespace MAVN.Service.SmartVouchers.Validation
 {
     [UsedImplicitly]
-    public class VoucherBuyModelValidator : AbstractValidator<VoucherBuyModel>
+    public class VoucherBuyModelValidator : AbstractValidator<VoucherProcessingModel>
     {
         public VoucherBuyModelValidator()
         {
