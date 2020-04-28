@@ -15,11 +15,18 @@ namespace MAVN.Service.SmartVouchers.Client
     public interface ISmartVouchersApi
     {
         /// <summary>
-        /// Buys a new voucher from passed voucher campaign.
+        /// Reserve a new voucher from passed voucher campaign.
         /// </summary>
-        /// <param name="model">The model that describes voucher buy request.</param>
-        [Post("/api/vouchers")]
-        Task<ProcessingVoucherErrorCodes> BuyVoucherAsync([Body] VoucherProcessingModel model);
+        /// <param name="model">The model that describes voucher reserve request.</param>
+        [Post("/api/vouchers/reserve")]
+        Task<ProcessingVoucherErrorCodes> ReserveVoucherAsync([Body] VoucherProcessingModel model);
+
+        /// <summary>
+        /// Cancel voucher reservation.
+        /// </summary>
+        /// <param name="model">The model that describes voucher canceling reservation request.</param>
+        [Post("/api/vouchers/cancelReservation")]
+        Task<ProcessingVoucherErrorCodes> CancelVoucherReservationAsync([Body] VoucherCancelReservationModel model);
 
         /// <summary>
         /// Redeem a voucher.

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MAVN.Service.SmartVouchers;
 using MAVN.Service.SmartVouchers.Client;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
@@ -82,7 +81,7 @@ namespace MAVN.Service.SmartVouchers.Tests
                         var controllerRoute = controllerRouteAttr.ConstructorArguments[0].Value.ToString();
                         implRoute = string.IsNullOrWhiteSpace(implRoute)
                             ? controllerRoute.Trim('/')
-                            : $"{controllerRoute.Trim('/')}/{implRoute.TrimStart('/')}";
+                            : $"{controllerRoute.Trim('/')}/{implRoute}";
                     }
 
                     if (apiRoute != implRoute)

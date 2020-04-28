@@ -27,19 +27,6 @@ namespace MAVN.Service.SmartVouchers.Controllers
         }
 
         /// <summary>
-        /// Buys a new voucher from passed voucher campaign.
-        /// </summary>
-        /// <param name="model">The model that describes voucher buy request.</param>
-        [HttpPost]
-        [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<ProcessingVoucherErrorCodes> BuyVoucherAsync([FromBody] VoucherProcessingModel model)
-        {
-            var result = await _vouchersService.BuyVoucherAsync(model.VoucherCampaignId, model.CustomerId);
-
-            return _mapper.Map<ProcessingVoucherErrorCodes>(result);
-        }
-
-        /// <summary>
         /// Reserve a new voucher from passed voucher campaign.
         /// </summary>
         /// <param name="model">The model that describes voucher reserve request.</param>
@@ -56,7 +43,6 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// Cancel voucher reservation.
         /// </summary>
         /// <param name="model">The model that describes voucher canceling reservation request.</param>
-        /// <returns></returns>
         [HttpPost("cancelReservation")]
         [ProducesResponseType(typeof(ProcessingVoucherErrorCodes), (int)HttpStatusCode.OK)]
         public async Task<ProcessingVoucherErrorCodes> CancelVoucherReservationAsync([FromBody] VoucherCancelReservationModel model)
