@@ -13,5 +13,7 @@
         VoucherCampaignNotActive,
         /// <summary>No available vouchers</summary>
         NoAvailableVouchers,
+        /// <summary>Voucher not found</summary>
+        VoucherNotFound,
     }
 }
