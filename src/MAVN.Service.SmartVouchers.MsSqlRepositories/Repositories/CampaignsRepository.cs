@@ -112,6 +112,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 }
 
                 var result = await query
+                    .Include(c => c.LocalizedContents)
                     .OrderByDescending(i => i.CreationDate)
                     .Skip(request.Skip)
                     .Take(request.Take)
