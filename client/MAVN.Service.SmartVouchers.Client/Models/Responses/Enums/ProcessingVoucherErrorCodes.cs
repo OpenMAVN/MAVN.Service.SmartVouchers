@@ -15,5 +15,7 @@
         NoAvailableVouchers,
         /// <summary>Voucher not found</summary>
         VoucherNotFound,
+        /// <summary>Invalid partner payment configuration</summary>
+        InvalidPartnerPaymentConfiguration,
     }
 }

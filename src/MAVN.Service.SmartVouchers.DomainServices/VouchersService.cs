@@ -7,6 +7,7 @@ using Common.Log;
 using Lykke.Common.Log;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.PaymentManagement.Client.Models.Requests;
+using MAVN.Service.PaymentManagement.Client.Models.Responses;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
@@ -136,6 +137,14 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         Currency = campaign.Currency,
                         PartnerId = campaign.PartnerId,
                     });
+                if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.Success)
+                {
+                    await CancelReservationAsync(voucher.ShortCode);
+                    return new VoucherReservationResult
+                    {
+                        ErrorCode = ProcessingVoucherError.InvalidPartnerPaymentConfiguration,
+                    };
+                }
 
                 await _paymentRequestsRepository.CreatePaymentRequestAsync(paymentRequestResult.PaymentRequestId, voucher.ShortCode);
 

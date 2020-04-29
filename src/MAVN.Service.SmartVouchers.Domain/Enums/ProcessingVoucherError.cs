@@ -7,5 +7,6 @@
         VoucherCampaignNotActive,
         NoAvailableVouchers,
         VoucherNotFound,
+        InvalidPartnerPaymentConfiguration,
     }
 }
