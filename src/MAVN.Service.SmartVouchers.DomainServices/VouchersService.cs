@@ -60,7 +60,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<VoucherReservationResult> ReserveVoucherAsync(Guid voucherCampaignId, Guid ownerId)
         {
-            var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId);
+            var campaign = await _campaignsRepository.GetByIdAsync(voucherCampaignId, false);
             if (campaign == null)
                 return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.VoucherCampaignNotFound };
 
@@ -185,7 +185,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (voucher == null)
                 return RedeemVoucherError.VoucherNotFound;
 
-            var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId);
+            var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, false);
             if (campaign == null)
                 return RedeemVoucherError.VoucherCampaignNotFound;
 

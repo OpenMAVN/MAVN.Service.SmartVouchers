@@ -65,14 +65,17 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task<VoucherCampaign> GetByIdAsync(Guid campaignId)
+        public async Task<VoucherCampaign> GetByIdAsync(Guid campaignId, bool includeContents)
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var entity = await context.VoucherCampaigns
-                    .Where(c => c.Id == campaignId)
-                    .Include(c => c.LocalizedContents)
-                    .FirstOrDefaultAsync();
+                var query = context.VoucherCampaigns
+                    .Where(c => c.Id == campaignId);
+
+                if (includeContents)
+                    query = query.Include(c => c.LocalizedContents);
+
+                var entity = await query.FirstOrDefaultAsync();
 
                 return _mapper.Map<VoucherCampaign>(entity);
             }

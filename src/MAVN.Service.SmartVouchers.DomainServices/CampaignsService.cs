@@ -52,7 +52,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<UpdateCampaignError> UpdateAsync(VoucherCampaign campaign)
         {
-            var oldCampaign = await _campaignsRepository.GetByIdAsync(campaign.Id);
+            var oldCampaign = await _campaignsRepository.GetByIdAsync(campaign.Id, true);
             if (oldCampaign == null)
             {
                 _log.Error($"Campaign {campaign.Id} not found for update");
@@ -94,7 +94,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<bool> DeleteAsync(Guid campaignId)
         {
-            var campaign = await _campaignsRepository.GetByIdAsync(campaignId);
+            var campaign = await _campaignsRepository.GetByIdAsync(campaignId, true);
 
             if (campaign == null)
             {
@@ -116,7 +116,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<VoucherCampaign> GetByIdAsync(Guid campaignId)
         {
-            var campaign = await _campaignsRepository.GetByIdAsync(campaignId);
+            var campaign = await _campaignsRepository.GetByIdAsync(campaignId, true);
 
             if (campaign == null)
                 return null;
@@ -142,7 +142,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task<ImageSaveError> SaveCampaignContentImage(FileModel file)
         {
-            var campaign = await _campaignsRepository.GetByIdAsync(file.CampaignId);
+            var campaign = await _campaignsRepository.GetByIdAsync(file.CampaignId, true);
 
             if (campaign == null)
                 return ImageSaveError.VoucherCampaignNotFound;
