@@ -43,12 +43,15 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task ReserveAsync(Voucher voucher)
+        public async Task ReserveAsync(Voucher voucher, Guid ownerId)
         {
             var entity = _mapper.Map<VoucherEntity>(voucher);
 
             using (var context = _contextFactory.CreateDataContext())
             {
+                entity.OwnerId = ownerId;
+                entity.Status = VoucherStatus.Reserved;
+
                 context.Vouchers.Update(entity);
 
                 var campaign = await context.VoucherCampaigns.FindAsync(entity.CampaignId);
@@ -65,6 +68,9 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
 
             using (var context = _contextFactory.CreateDataContext())
             {
+                entity.Status = VoucherStatus.InStock;
+                entity.OwnerId = null;
+
                 context.Vouchers.Update(entity);
 
                 var campaign = await context.VoucherCampaigns.FindAsync(entity.CampaignId);

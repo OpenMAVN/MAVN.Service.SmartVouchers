@@ -92,9 +92,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     try
                     {
                         voucher = vouchers.FirstOrDefault();
-                        voucher.OwnerId = ownerId;
-                        voucher.Status = VoucherStatus.Reserved;
-                        await _vouchersRepository.ReserveAsync(voucher);
+                        await _vouchersRepository.ReserveAsync(voucher, ownerId);
                     }
                     catch (Exception e)
                     {
@@ -282,7 +280,6 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 return ProcessingVoucherError.VoucherNotFound;
             }
 
-            voucher.Status = VoucherStatus.InStock;
             await _vouchersRepository.CancelReservationAsync(voucher);
 
             await _redisLocksService.ReleaseLockAsync(voucher.ShortCode, voucher.ShortCode);

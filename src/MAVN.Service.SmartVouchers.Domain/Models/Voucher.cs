@@ -10,7 +10,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public string ValidationCodeHash { get; set; }
         public Guid CampaignId { get; set; }
         public VoucherStatus Status { get; set; }
-        public Guid OwnerId { get; set; }
+        public Guid? OwnerId { get; set; }
         public DateTime? PurchaseDate { get; set; }
         public DateTime? RedemptionDate { get; set; }
     }

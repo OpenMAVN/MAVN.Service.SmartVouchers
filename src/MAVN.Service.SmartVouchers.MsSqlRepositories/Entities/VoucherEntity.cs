@@ -28,7 +28,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Entities
         public VoucherStatus Status { get; set; }
 
         [Column("owner_id")]
-        public Guid OwnerId { get; set; }
+        public Guid? OwnerId { get; set; }
 
         [Column("purchase_date")]
         public DateTime? PurchaseDate { get; set; }
