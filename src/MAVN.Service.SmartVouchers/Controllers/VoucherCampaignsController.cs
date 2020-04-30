@@ -71,6 +71,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
             {
                 CampaignName = request.CampaignName,
                 OnlyActive = request.OnlyActive,
+                CreatedBy = request.CreatedBy,
                 Skip = (request.CurrentPage - 1) * request.PageSize,
                 Take = request.PageSize,
             };

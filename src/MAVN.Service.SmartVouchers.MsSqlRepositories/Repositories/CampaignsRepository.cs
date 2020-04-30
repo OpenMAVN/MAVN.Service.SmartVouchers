@@ -105,14 +105,21 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     var name = request.CampaignName.Trim().ToLower();
                     query = query.Where(c => c.Name.ToLower().Contains(name));
                 }
+
                 if (request.OnlyActive)
                 {
                     var now = DateTime.UtcNow;
                     query = query.Where(c => c.FromDate <= now && (!c.ToDate.HasValue || c.ToDate.Value > now));
                 }
 
+                if (request.CreatedBy.HasValue && request.CreatedBy.Value != Guid.Empty)
+                {
+                    query = query.Where(p => p.CreatedBy == request.CreatedBy.ToString());
+                }
+
                 var result = await query
                     .Include(c => c.LocalizedContents)
+                    .AsNoTracking()
                     .OrderByDescending(i => i.CreationDate)
                     .Skip(request.Skip)
                     .Take(request.Take)
