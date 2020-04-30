@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
@@ -13,5 +14,8 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 
         /// <summary>Only active campaigns flag</summary>
         public bool OnlyActive { get; set; }
+
+        /// <summary>Voucher campaign's author</summary>
+        public Guid? CreatedBy { get; set; }
     }
 }
