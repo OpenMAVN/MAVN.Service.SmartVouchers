@@ -137,7 +137,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         Currency = campaign.Currency,
                         PartnerId = campaign.PartnerId,
                     });
-                if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.Success)
+                if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.None)
                 {
                     await CancelReservationAsync(voucher.ShortCode);
                     return new VoucherReservationResult
