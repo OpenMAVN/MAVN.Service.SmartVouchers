@@ -8,6 +8,11 @@ namespace MAVN.Service.SmartVouchers.Contract
     public class SmartVoucherSoldEvent
     {
         /// <summary>
+        /// Id of the voucher payment request
+        /// </summary>
+        public string PaymentRequestId { get; set; }
+        
+        /// <summary>
         /// Timestamp
         /// </summary>
         public DateTime Timestamp { get; set; }

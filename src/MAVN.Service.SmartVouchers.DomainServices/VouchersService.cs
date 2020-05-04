@@ -80,6 +80,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 Timestamp = DateTime.UtcNow,
                 CampaignId = voucher.CampaignId,
                 VoucherShortCode = voucher.ShortCode,
+                PaymentRequestId = paymentRequestId.ToString(),
             });
 
             return ProcessingVoucherError.None;
