@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Log;
+using Lykke.RabbitMqBroker.Publisher;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.PaymentManagement.Client.Models.Requests;
 using MAVN.Service.PaymentManagement.Client.Models.Responses;
+using MAVN.Service.SmartVouchers.Contract;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
@@ -24,6 +26,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private readonly ICampaignsRepository _campaignsRepository;
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
         private readonly IRedisLocksService _redisLocksService;
+        private readonly IRabbitPublisher<SmartVoucherSoldEvent> _voucherSoldPublisher;
         private readonly ILog _log;
         private readonly TimeSpan _lockTimeOut;
 
@@ -34,6 +37,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             IPaymentRequestsRepository paymentRequestsRepository,
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
+            IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
             TimeSpan lockTimeOut)
         {
             _paymentManagementClient = paymentManagementClient;
@@ -41,6 +45,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _campaignsRepository = campaignsRepository;
             _paymentRequestsRepository = paymentRequestsRepository;
             _redisLocksService = redisLocksService;
+            _voucherSoldPublisher = voucherSoldPublisher;
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
         }
@@ -50,11 +55,32 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             var voucherShortCode = await _paymentRequestsRepository.GetVoucherShortCodeAsync(paymentRequestId);
 
             var voucher = await _vouchersRepository.GetByShortCodeAsync(voucherShortCode);
-            if (voucher != null)
+            if (voucher == null)
                 return ProcessingVoucherError.VoucherNotFound;
+
+            if (voucher.OwnerId == null)
+            {
+                _log.Error(message: "Reserved voucher with missing owner", context: voucher);
+                throw new InvalidOperationException("Reserved voucher with missing owner");
+            }
+
+            var voucherCampaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, false);
+            if (voucherCampaign == null)
+                return ProcessingVoucherError.VoucherCampaignNotFound;
 
             voucher.Status = VoucherStatus.Sold;
             await _vouchersRepository.UpdateAsync(voucher);
+
+            await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
+            {
+                Amount = voucherCampaign.VoucherPrice,
+                Currency = voucherCampaign.Currency,
+                CustomerId = voucher.OwnerId.Value,
+                PartnerId = voucherCampaign.PartnerId,
+                Timestamp = DateTime.UtcNow,
+                CampaignId = voucher.CampaignId,
+                VoucherShortCode = voucher.ShortCode,
+            });
 
             return ProcessingVoucherError.None;
         }
@@ -206,7 +232,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (voucher.ValidationCode != validationCode)
                 return RedeemVoucherError.WrongValidationCode;
 
-            voucher.Status = VoucherStatus.Sold;
+            voucher.Status = VoucherStatus.Used;
             voucher.RedemptionDate = DateTime.UtcNow;
 
             await _vouchersRepository.UpdateAsync(voucher);

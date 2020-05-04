@@ -15,6 +15,9 @@
         Reserved,
 
         /// <summary>Indicates that the voucher bought by a customer.</summary>
-        Sold
+        Sold,
+
+        /// <summary>Indicates that the voucher has been used by a customer/// </summary>
+        Used,
     }
 }
