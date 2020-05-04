@@ -27,7 +27,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices.RabbitSubscribers
 
         protected override async Task ProcessMessageAsync(PaymentCompletedEvent evt)
         {
-            await _voucherService.ProcessPaymentRequestAsync(new Guid(evt.PaymentRequestId));
+            await _voucherService.ProcessPaymentRequestAsync(Guid.Parse(evt.PaymentRequestId));
 
             _log.Info($"Handled {typeof(object).Name}", evt);
         }
