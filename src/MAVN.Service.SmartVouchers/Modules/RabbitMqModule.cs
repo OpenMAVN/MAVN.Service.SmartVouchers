@@ -12,7 +12,7 @@ namespace MAVN.Service.SmartVouchers.Modules
     [UsedImplicitly]
     public class RabbitMqModule : Module
     {
-        private const string PubExchangeName = "lykke.smart-vouchers.vouchesold";
+        private const string PubExchangeName = "lykke.smart-vouchers.vouchersold";
         private const string SubExchangeName = "REPLACE THIS WITH PROPER EXCHANGE NAME"; // TODO pass proper exchange name
 
         private readonly RabbitMqSettings _settings;
