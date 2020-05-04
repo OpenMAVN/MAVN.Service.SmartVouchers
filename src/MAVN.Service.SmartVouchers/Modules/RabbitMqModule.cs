@@ -5,13 +5,14 @@ using MAVN.Service.SmartVouchers.Settings;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.SettingsReader;
+using MAVN.Service.SmartVouchers.Contract;
 
 namespace MAVN.Service.SmartVouchers.Modules
 {
     [UsedImplicitly]
     public class RabbitMqModule : Module
     {
-        private const string PubExchangeName = "REPLACE THIS WITH PROPER EXCHANGE NAME"; // TODO pass proper exchange name
+        private const string PubExchangeName = "lykke.smart-vouchers.vouchesold";
         private const string SubExchangeName = "REPLACE THIS WITH PROPER EXCHANGE NAME"; // TODO pass proper exchange name
 
         private readonly RabbitMqSettings _settings;
@@ -33,9 +34,9 @@ namespace MAVN.Service.SmartVouchers.Modules
         // registered publishers could be esolved by IRabbitPublisher<TMessage> interface
         private void RegisterRabbitMqPublishers(ContainerBuilder builder)
         {
-            //builder.RegisterJsonRabbitPublisher<MyPublishedMessage>(
-            //    _settings.Publishers.ConnectionString,
-            //    PubExchangeName);
+            builder.RegisterJsonRabbitPublisher<SmartVoucherSoldEvent>(
+                _settings.Publishers.ConnectionString,
+                PubExchangeName);
         }
 
         private void RegisterRabbitMqSubscribers(ContainerBuilder builder)
