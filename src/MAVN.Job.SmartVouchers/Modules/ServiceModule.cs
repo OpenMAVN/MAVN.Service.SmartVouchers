@@ -12,7 +12,6 @@ using StackExchange.Redis;
 
 namespace MAVN.Job.SmartVouchers.Modules
 {
-
     [UsedImplicitly]
     public class ServiceModule : Module
     {

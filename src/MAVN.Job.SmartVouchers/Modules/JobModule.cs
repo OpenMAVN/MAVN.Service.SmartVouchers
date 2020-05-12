@@ -24,7 +24,6 @@ namespace MAVN.Job.SmartVouchers.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
