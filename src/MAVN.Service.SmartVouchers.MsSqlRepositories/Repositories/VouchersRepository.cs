@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
@@ -51,6 +51,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             {
                 entity.OwnerId = ownerId;
                 entity.Status = VoucherStatus.Reserved;
+                entity.PurchaseDate = DateTime.UtcNow;
 
                 context.Vouchers.Update(entity);
 
@@ -70,6 +71,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             {
                 entity.Status = VoucherStatus.InStock;
                 entity.OwnerId = null;
+                entity.PurchaseDate = null;
 
                 context.Vouchers.Update(entity);
 
@@ -184,6 +186,18 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 var query = context.Vouchers.Where(v => v.CampaignId == campaignId && v.Status == status);
                 var result = await query.ToListAsync();
                 return _mapper.Map<List<Voucher>>(result);
+            }
+        }
+
+        public async Task<List<Voucher>> GetReservedVouchersBeforeDateAsync(DateTime reservationTimeoutDate)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var query = context.Vouchers.Where(v =>
+                    v.Status == VoucherStatus.Reserved && v.PurchaseDate.Value < reservationTimeoutDate);
+                var vouchers = await query.ToListAsync();
+
+                return _mapper.Map<List<Voucher>>(vouchers);
             }
         }
     }

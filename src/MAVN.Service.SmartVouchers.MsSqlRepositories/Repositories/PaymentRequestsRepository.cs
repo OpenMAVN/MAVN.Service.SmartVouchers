@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
 {
@@ -38,6 +39,16 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 var result = await context.PaymentRequests.FindAsync(paymentRequestId);
 
                 return result?.VoucherShortCode;
+            }
+        }
+
+        public async Task<Guid?> PaymentRequestExistsAsync(string voucherShortCode)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var result = await context.PaymentRequests.FirstOrDefaultAsync(p => p.VoucherShortCode == voucherShortCode);
+
+                return result?.Id;
             }
         }
     }

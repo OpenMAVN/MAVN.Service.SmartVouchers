@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;

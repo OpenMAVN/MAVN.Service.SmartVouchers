@@ -26,6 +26,40 @@ SmartVouchersService:
       settings-key: SmartVouchersService-Redis-ConnectionString
   VoucherLockTimeOut:
     settings-key: SmartVouchersService-VoucherLockTimeOut
+SmartVouchersJob:
+  Db:
+    LogsConnString:
+      settings-key: SmartVouchersService-LogsConnString
+      types:
+        - AzureTableStorage
+    SqlDbConnString:
+      settings-key: SmartVouchersService-SqlDbConnString
+    CampaignsImageConnString:
+      settings-key: SmartVouchersService-CampaignsImageConnString
+      types:
+        - AzureTableStorage
+  Rabbit:
+    Publishers:
+      ConnectionString:
+        settings-key: WalletManagementRabbitMQ
+        types:
+          - RabbitMq
+    Subscribers:
+      ConnectionString:
+        settings-key: WalletManagementRabbitMQ
+        types:
+          - RabbitMq
+  Redis:
+    ConnectionString:
+      settings-key: SmartVouchersService-Redis-ConnectionString
+  VoucherLockTimeOut:
+    settings-key: SmartVouchersService-VoucherLockTimeOut
+  IdlePeriod:
+    settings-key: SmartVouchersJob-JobIdlePeriod
+  GeneratePaymentTimeoutPeriod:
+    settings-key: SmartVouchersJob-GeneratePaymentTimeoutPeriod
+  FinishPaymentTimeoutPeriod:
+    settings-key: SmartVouchersJob-FinishPaymentTimeoutPeriod
 SlackNotifications:
     AzureQueue:
         ConnectionString:

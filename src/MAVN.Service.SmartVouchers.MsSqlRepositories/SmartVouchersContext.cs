@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using JetBrains.Annotations;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
