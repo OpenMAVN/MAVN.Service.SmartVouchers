@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using JetBrains.Annotations;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +75,10 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
             modelBuilder.Entity<VoucherValidationEntity>()
                 .HasIndex(o => o.VoucherId)
                 .IsUnique();
+
+            modelBuilder.Entity<PaymentRequestEntity>()
+                .HasIndex(o => o.VoucherShortCode)
+                .IsUnique(false);
         }
     }
 }

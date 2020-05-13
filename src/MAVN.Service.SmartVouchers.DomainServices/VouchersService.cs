@@ -20,6 +20,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
     public class VouchersService : IVouchersService
     {
         private const int MaxAttemptsCount = 5;
+        private const string SuccessPaymentStatus = "success";
+        private const string PendingPaymentStatus = "pending";
 
         private readonly IPaymentManagementClient _paymentManagementClient;
         private readonly IVouchersRepository _vouchersRepository;
@@ -283,6 +285,49 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 customerId,
                 (pageInfo.CurrentPage - 1) * pageInfo.PageSize,
                 pageInfo.PageSize);
+        }
+
+        public async Task ProcessStuckReservedVouchersAsync(TimeSpan generatePaymentTimeoutPeriod, TimeSpan finishPaymentTimeoutPeriod)
+        {
+            var paymentTimeoutDate = DateTime.UtcNow - generatePaymentTimeoutPeriod;
+            var vouchers = await _vouchersRepository.GetReservedVouchersBeforeDateAsync(paymentTimeoutDate);
+
+            foreach (var voucher in vouchers)
+            {
+                var paymentRequestId = await _paymentRequestsRepository.PaymentRequestExistsAsync(voucher.ShortCode);
+
+                if (paymentRequestId == null)
+                {
+                    await CancelReservationAsync(voucher.ShortCode);
+                    continue;
+                }
+
+                var paymentManagementResponse = await _paymentManagementClient.Api.ValidatePaymentAsync(
+                    new PaymentValidationRequest
+                    {
+                        PaymentRequestId = paymentRequestId.Value
+                    });
+
+                _log.Info(
+                    "Received status for payment request for reserved voucher while processing stuck reserved vouchers",
+                    new
+                    {
+                        VoucherShortCode = voucher.ShortCode,
+                        PaymentRequestId = paymentRequestId.Value,
+                        PaymentStatus = paymentManagementResponse
+                    });
+
+                switch (paymentManagementResponse.ToLower())
+                {
+                    case SuccessPaymentStatus:
+                        await ProcessPaymentRequestAsync(paymentRequestId.Value);
+                        continue;
+                    case PendingPaymentStatus when voucher.PurchaseDate > DateTime.UtcNow - finishPaymentTimeoutPeriod:
+                        continue;
+                }
+
+                await CancelReservationAsync(voucher.ShortCode);
+            }
         }
 
         private string GenerateShortCodeFromId(long voucherId)

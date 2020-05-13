@@ -4,16 +4,16 @@ using AzureStorage.Blob;
 using AzureStorage.Tables;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
-using Lykke.SettingsReader;
 using MAVN.Common.MsSql;
+using Lykke.SettingsReader;
+using MAVN.Job.SmartVouchers.Settings;
 using MAVN.Service.SmartVouchers.AzureRepositories;
 using MAVN.Service.SmartVouchers.AzureRepositories.Entities;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories;
-using MAVN.Service.SmartVouchers.Settings;
 
-namespace MAVN.Service.SmartVouchers.Modules
+namespace MAVN.Job.SmartVouchers.Modules
 {
     [UsedImplicitly]
     public class DbModule : Module
@@ -25,8 +25,8 @@ namespace MAVN.Service.SmartVouchers.Modules
 
         public DbModule(IReloadingManager<AppSettings> appSettings)
         {
-            _connectionString = appSettings.CurrentValue.SmartVouchersService.Db.SqlDbConnString;
-            _rulesImageConnString = appSettings.Nested(s => s.SmartVouchersService.Db.CampaignsImageConnString);
+            _connectionString = appSettings.CurrentValue.SmartVouchersJob.Db.SqlDbConnString;
+            _rulesImageConnString = appSettings.Nested(s => s.SmartVouchersJob.Db.CampaignsImageConnString);
         }
 
         protected override void Load(ContainerBuilder builder)
