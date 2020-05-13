@@ -17,7 +17,7 @@ using MAVN.Service.SmartVouchers.Domain.Services;
 
 namespace MAVN.Service.SmartVouchers.DomainServices
 {
-    public class   VouchersService : IVouchersService
+    public class VouchersService : IVouchersService
     {
         private const int MaxAttemptsCount = 5;
         private const string SuccessPaymentStatus = "success";
@@ -306,6 +306,15 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     new PaymentValidationRequest
                     {
                         PaymentRequestId = paymentRequestId.Value
+                    });
+
+                _log.Info(
+                    "Received status for payment request for reserved voucher while processing stuck reserved vouchers",
+                    new
+                    {
+                        VoucherShortCode = voucher.ShortCode,
+                        PaymentRequestId = paymentRequestId.Value,
+                        PaymentStatus = paymentManagementResponse
                     });
 
                 switch (paymentManagementResponse.ToLower())

@@ -75,6 +75,10 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
             modelBuilder.Entity<VoucherValidationEntity>()
                 .HasIndex(o => o.VoucherId)
                 .IsUnique();
+
+            modelBuilder.Entity<PaymentRequestEntity>()
+                .HasIndex(o => o.VoucherShortCode)
+                .IsUnique(false);
         }
     }
 }
