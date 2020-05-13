@@ -8,13 +8,13 @@ on:
 env:
   RELEASE_CLIENT: true
   RELEASE_CONTRACT: true
-  RELEASE_JOB: false
+  RELEASE_JOB: true
   RELEASE_SERVICE: true
   
   CLIENT_PROJECT: ./client/MAVN.Service.SmartVouchers.Client/MAVN.Service.SmartVouchers.Client.csproj
   CONTRACT_PROJECT: ./contract/MAVN.Service.SmartVouchers.Contract/MAVN.Service.SmartVouchers.Contract.csproj
-  JOB_DOCKER_IMAGE:
-  JOB_PROJECT:
+  JOB_DOCKER_IMAGE: smart-vouchers-job
+  JOB_PROJECT: ./src/MAVN.Job.SmartVouchers/MAVN.Job.SmartVouchers.csproj
   SERVICE_DOCKER_IMAGE: smart-vouchers-service
   SERVICE_PROJECT: ./src/MAVN.Service.SmartVouchers/MAVN.Service.SmartVouchers.csproj
     
