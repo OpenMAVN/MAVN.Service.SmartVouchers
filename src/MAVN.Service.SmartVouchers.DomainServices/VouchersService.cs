@@ -73,17 +73,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             voucher.Status = VoucherStatus.Sold;
             await _vouchersRepository.UpdateAsync(voucher);
 
-            await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
-            {
-                Amount = voucherCampaign.VoucherPrice,
-                Currency = voucherCampaign.Currency,
-                CustomerId = voucher.OwnerId.Value,
-                PartnerId = voucherCampaign.PartnerId,
-                Timestamp = DateTime.UtcNow,
-                CampaignId = voucher.CampaignId,
-                VoucherShortCode = voucher.ShortCode,
-                PaymentRequestId = paymentRequestId.ToString(),
-            });
+            await PublishVoucherSoldEvent(paymentRequestId, voucherCampaign, voucher);
 
             return ProcessingVoucherError.None;
         }
@@ -102,6 +92,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
                 return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
 
+            var voucherPriceIsZero = campaign.VoucherPrice == 0;
             var voucherCampaignIdStr = voucherCampaignId.ToString();
             for (int i = 0; i < MaxAttemptsCount; ++i)
             {
@@ -121,8 +112,18 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 {
                     try
                     {
-                        voucher = vouchers.FirstOrDefault();
-                        await _vouchersRepository.ReserveAsync(voucher, ownerId);
+                        voucher = vouchers.First();
+                        if (voucherPriceIsZero)
+                        {
+                            voucher.Status = VoucherStatus.Sold;
+                            voucher.OwnerId = ownerId;
+                            voucher.PurchaseDate = DateTime.UtcNow;
+                            await _vouchersRepository.UpdateAsync(voucher);
+                        }
+                        else
+                        {
+                            await _vouchersRepository.ReserveAsync(voucher, ownerId);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -144,7 +145,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     voucher = new Voucher
                     {
                         CampaignId = voucherCampaignId,
-                        Status = VoucherStatus.Reserved,
+                        Status = voucherPriceIsZero ? VoucherStatus.Sold : VoucherStatus.Reserved,
                         ValidationCodeHash = hash,
                         OwnerId = ownerId,
                         PurchaseDate = DateTime.UtcNow,
@@ -158,6 +159,15 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
                 await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
 
+                if (voucherPriceIsZero)
+                {
+                    await PublishVoucherSoldEvent(null, campaign, voucher);
+                    return new VoucherReservationResult
+                    {
+                        ErrorCode = ProcessingVoucherError.None
+                    };
+                }
+
                 var paymentRequestResult = await _paymentManagementClient.Api.GeneratePaymentAsync(
                     new PaymentGenerationRequest
                     {
@@ -166,6 +176,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         Currency = campaign.Currency,
                         PartnerId = campaign.PartnerId,
                     });
+
                 if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.None)
                 {
                     await CancelReservationAsync(voucher.ShortCode);
@@ -328,6 +339,21 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
                 await CancelReservationAsync(voucher.ShortCode);
             }
+        }
+
+        private async Task PublishVoucherSoldEvent(Guid? paymentRequestId, VoucherCampaign voucherCampaign, Voucher voucher)
+        {
+            await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
+            {
+                Amount = voucherCampaign.VoucherPrice,
+                Currency = voucherCampaign.Currency,
+                CustomerId = voucher.OwnerId.Value,
+                PartnerId = voucherCampaign.PartnerId,
+                Timestamp = DateTime.UtcNow,
+                CampaignId = voucher.CampaignId,
+                VoucherShortCode = voucher.ShortCode,
+                PaymentRequestId = paymentRequestId?.ToString(),
+            });
         }
 
         private string GenerateShortCodeFromId(long voucherId)
