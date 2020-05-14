@@ -17,5 +17,8 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 
         /// <summary>Voucher campaign's author</summary>
         public Guid? CreatedBy { get; set; }
+
+        /// <summary>Optional parameter used for filtering</summary>
+        public Guid[] PartnerIds { get; set; }
     }
 }

@@ -101,6 +101,11 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 var query = context.VoucherCampaigns
                     .Where(c => c.State != CampaignState.Deleted);
 
+                if (request.PartnerIds.Any())
+                {
+                    query = query.Where(c => request.PartnerIds.Contains(c.PartnerId));
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.CampaignName))
                 {
                     var name = request.CampaignName.Trim().ToLower();
