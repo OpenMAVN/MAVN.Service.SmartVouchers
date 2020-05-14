@@ -112,7 +112,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
 
             return new VoucherCampaignsListResponseModel
             {
-                Campaigns = _mapper.Map<IReadOnlyList<VoucherCampaignResponseModel>>(campaigns),
+                Campaigns = _mapper.Map<IReadOnlyList<VoucherCampaignDetailsResponseModel>>(campaigns),
             };
         }
 

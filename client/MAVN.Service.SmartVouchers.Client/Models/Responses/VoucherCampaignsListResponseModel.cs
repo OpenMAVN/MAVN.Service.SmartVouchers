@@ -13,6 +13,6 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Responses
         /// <summary>
         /// List of Campaigns
         /// </summary>
-        public IReadOnlyList<VoucherCampaignResponseModel> Campaigns { get; set; }
+        public IReadOnlyList<VoucherCampaignDetailsResponseModel> Campaigns { get; set; }
     }
 }
