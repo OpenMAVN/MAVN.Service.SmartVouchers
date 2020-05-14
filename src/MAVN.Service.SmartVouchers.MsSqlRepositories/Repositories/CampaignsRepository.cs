@@ -87,6 +87,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             {
                 var query = await context.VoucherCampaigns.AsNoTracking()
                     .Where(c => campaignIds.Contains(c.Id))
+                    .Include(c => c.LocalizedContents)
                     .ToListAsync();
 
                 return _mapper.Map<List<VoucherCampaign>>(query);
