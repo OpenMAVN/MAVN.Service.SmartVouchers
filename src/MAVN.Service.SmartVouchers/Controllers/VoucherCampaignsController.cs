@@ -74,6 +74,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
                 CreatedBy = request.CreatedBy,
                 Skip = (request.CurrentPage - 1) * request.PageSize,
                 Take = request.PageSize,
+                PartnerIds = request.PartnerIds,
             };
 
             var campaignsPaged = await _campaignsService.GetCampaignsAsync(campaignListRequestModel);
