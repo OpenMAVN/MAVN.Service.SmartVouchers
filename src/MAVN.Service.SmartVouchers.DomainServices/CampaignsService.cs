@@ -146,9 +146,20 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return campaigns;
         }
 
-        public Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds)
+        public async Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds)
         {
-            return _campaignsRepository.GetCampaignsByIdsAsync(campaignIds);
+            var campaigns = await _campaignsRepository.GetCampaignsByIdsAsync(campaignIds);
+
+            foreach (var campaign in campaigns)
+            {
+                foreach (var content in campaign.LocalizedContents)
+                {
+                    if (content.ContentType == CampaignContentType.ImageUrl)
+                        content.Image = await _fileService.GetAsync(content.Id);
+                }
+            }
+
+            return campaigns;
         }
 
         public async Task<ImageSaveError> SaveCampaignContentImage(FileModel file)
