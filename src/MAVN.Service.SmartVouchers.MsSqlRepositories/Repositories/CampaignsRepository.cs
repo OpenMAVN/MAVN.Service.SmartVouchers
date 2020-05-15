@@ -101,7 +101,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 var query = context.VoucherCampaigns
                     .Where(c => c.State != CampaignState.Deleted);
 
-                if (request.PartnerIds.Any())
+                if (request.PartnerIds != null && request.PartnerIds.Any())
                 {
                     query = query.Where(c => request.PartnerIds.Contains(c.PartnerId));
                 }
