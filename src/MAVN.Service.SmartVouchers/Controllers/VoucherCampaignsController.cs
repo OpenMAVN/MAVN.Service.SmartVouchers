@@ -7,6 +7,7 @@ using MAVN.Service.SmartVouchers.Client;
 using MAVN.Service.SmartVouchers.Client.Models.Requests;
 using MAVN.Service.SmartVouchers.Client.Models.Responses;
 using MAVN.Service.SmartVouchers.Client.Models.Responses.Enums;
+using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
 using MAVN.Service.SmartVouchers.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
                 Skip = (request.CurrentPage - 1) * request.PageSize,
                 Take = request.PageSize,
                 PartnerIds = request.PartnerIds,
+                CampaignState = (CampaignState?) request.VoucherCampaignState,
             };
 
             var campaignsPaged = await _campaignsService.GetCampaignsAsync(campaignListRequestModel);

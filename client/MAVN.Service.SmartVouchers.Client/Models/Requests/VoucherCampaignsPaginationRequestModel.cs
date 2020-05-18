@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using MAVN.Service.SmartVouchers.Client.Models.Enums;
 
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
@@ -20,5 +21,8 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 
         /// <summary>Optional parameter used for filtering</summary>
         public Guid[] PartnerIds { get; set; }
+
+        /// <summary>Optional parameter used for filtering</summary>
+        public VoucherCampaignState? VoucherCampaignState { get; set; }
     }
 }
