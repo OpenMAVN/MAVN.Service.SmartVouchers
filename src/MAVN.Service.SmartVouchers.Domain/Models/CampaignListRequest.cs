@@ -9,6 +9,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public bool OnlyActive { get; set; }
         public Guid? CreatedBy { get; set; }
         public Guid[] PartnerIds { get; set; }
+        public CampaignState? CampaignState { get; set; }
         public int Skip { get; set; }
         public int Take { get; set; }
     }

@@ -112,6 +112,11 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     query = query.Where(c => c.Name.ToLower().Contains(name));
                 }
 
+                if (request.CampaignState.HasValue)
+                {
+                    query = query.Where(c => c.State == request.CampaignState.Value);
+                }
+
                 if (request.OnlyActive)
                 {
                     var now = DateTime.UtcNow;
