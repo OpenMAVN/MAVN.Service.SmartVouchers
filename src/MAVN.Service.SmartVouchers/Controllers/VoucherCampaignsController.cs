@@ -64,9 +64,9 @@ namespace MAVN.Service.SmartVouchers.Controllers
 
         /// <inheritdoc/>
         /// <response code="200">A collection of campaigns.</response>
-        [HttpGet]
+        [HttpPost("/list")]
         [ProducesResponseType(typeof(PaginatedVoucherCampaignsListResponseModel), (int)HttpStatusCode.OK)]
-        public async Task<PaginatedVoucherCampaignsListResponseModel> GetAsync(VoucherCampaignsPaginationRequestModel request)
+        public async Task<PaginatedVoucherCampaignsListResponseModel> GetAsync([FromBody]VoucherCampaignsPaginationRequestModel request)
         {
             var campaignListRequestModel = new CampaignListRequest
             {

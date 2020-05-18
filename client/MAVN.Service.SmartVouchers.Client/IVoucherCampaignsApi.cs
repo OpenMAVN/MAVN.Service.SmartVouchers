@@ -19,8 +19,8 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         /// <param name="request">The model that describes voucher campaigns request model.</param>
         /// <returns>CampaignListModel</returns>
-        [Get("/api/campaigns")]
-        Task<PaginatedVoucherCampaignsListResponseModel> GetAsync(VoucherCampaignsPaginationRequestModel request);
+        [Post("/api/campaigns/list")]
+        Task<PaginatedVoucherCampaignsListResponseModel> GetAsync([Body]VoucherCampaignsPaginationRequestModel request);
 
         /// <summary>
         /// Returns a Campaign by campaignId.
