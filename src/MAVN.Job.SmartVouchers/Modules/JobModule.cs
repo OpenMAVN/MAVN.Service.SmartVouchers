@@ -38,9 +38,14 @@ namespace MAVN.Job.SmartVouchers.Modules
                 .SingleInstance();
 
             builder.RegisterType<ReservedVouchersTimeoutManager>()
-                .WithParameter("idlePeriod", _settings.SmartVouchersJob.JobIdlePeriod)
+                .WithParameter("idlePeriod", _settings.SmartVouchersJob.ReservedVouchersTimeoutJobIdlePeriod)
                 .WithParameter("generatePaymentTimeout", _settings.SmartVouchersJob.GeneratePaymentTimeoutPeriod)
                 .WithParameter("finishPaymentTimeout", _settings.SmartVouchersJob.FinishPaymentTimeoutPeriod)
+                .As<IStartStop>()
+                .SingleInstance();
+
+            builder.RegisterType<ExpiredVouchersManager>()
+                .WithParameter("idlePeriod", _settings.SmartVouchersJob.ExpiredVouchersJobIdlePeriod)
                 .As<IStartStop>()
                 .SingleInstance();
         }

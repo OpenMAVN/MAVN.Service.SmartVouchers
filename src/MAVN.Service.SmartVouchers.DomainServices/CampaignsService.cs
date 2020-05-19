@@ -58,6 +58,10 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 _log.Error($"Campaign {campaign.Id} not found for update");
                 return UpdateCampaignError.VoucherCampaignNotFound;
             }
+
+            if( oldCampaign.State == CampaignState.Published && oldCampaign.FromDate <= DateTime.UtcNow)
+                return UpdateCampaignError.CampaignAlreadyStarted;
+
             if (campaign.VouchersTotalCount < oldCampaign.BoughtVouchersCount)
                 return UpdateCampaignError.TotalCountMustBeGreaterThanBoughtVouchersCount;
 

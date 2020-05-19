@@ -16,5 +16,7 @@
 
         /// <summary>Indicates that the voucher has been used by a customer/// </summary>
         Used,
+        /// <summary>Indicates that the voucher has expired and cannot be used/// </summary>
+        Expired,
     }
 }

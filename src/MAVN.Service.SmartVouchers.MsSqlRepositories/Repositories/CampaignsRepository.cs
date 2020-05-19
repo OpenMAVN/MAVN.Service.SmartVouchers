@@ -166,5 +166,20 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 return (publishedCampaignsVouchersCount, activeCampaignsVouchersCount);
             }
         }
+
+        public async Task<Guid[]> GetFinishedCampaignsIdsAsync()
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var now = DateTime.UtcNow;
+
+                var result = await context.VoucherCampaigns
+                    .Where(c => c.ToDate <= now)
+                    .Select(x => x.Id)
+                    .ToArrayAsync();
+
+                return result;
+            }
+        }
     }
 }

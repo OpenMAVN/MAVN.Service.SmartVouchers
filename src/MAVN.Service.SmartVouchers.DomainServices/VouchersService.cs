@@ -341,6 +341,12 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             }
         }
 
+        public async Task MarkVouchersFromFinishedCampaignsAsExpired()
+        {
+            var finishedCampaignsIds = await _campaignsRepository.GetFinishedCampaignsIdsAsync();
+            await _vouchersRepository.SetVouchersFromCampaignsAsExpired(finishedCampaignsIds);
+        }
+
         private async Task PublishVoucherSoldEvent(Guid? paymentRequestId, VoucherCampaign voucherCampaign, Voucher voucher)
         {
             await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
