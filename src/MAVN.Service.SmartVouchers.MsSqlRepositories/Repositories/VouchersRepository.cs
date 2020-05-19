@@ -200,5 +200,23 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 return _mapper.Map<List<Voucher>>(vouchers);
             }
         }
+
+        public async Task SetVouchersFromCampaignsAsExpired(Guid[] campaignsIds)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var vouchers = await context.Vouchers
+                    .Where(v => campaignsIds.Contains(v.CampaignId))
+                    .ToListAsync();
+
+                foreach (var voucher in vouchers)
+                {
+                    voucher.Status = VoucherStatus.Expired;
+                    context.Vouchers.Update(voucher);
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

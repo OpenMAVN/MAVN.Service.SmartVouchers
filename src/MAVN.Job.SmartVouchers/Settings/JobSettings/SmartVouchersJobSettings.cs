@@ -12,7 +12,9 @@ namespace MAVN.Job.SmartVouchers.Settings.JobSettings
 
         public TimeSpan VoucherLockTimeOut { get; set; }
 
-        public TimeSpan JobIdlePeriod { get; set; }
+        public TimeSpan ExpiredVouchersJobIdlePeriod { get; set; }
+
+        public TimeSpan ReservedVouchersTimeoutJobIdlePeriod { get; set; }
 
         public TimeSpan GeneratePaymentTimeoutPeriod { get; set; }
 

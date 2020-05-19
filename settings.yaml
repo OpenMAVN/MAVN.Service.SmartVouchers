@@ -54,8 +54,10 @@ SmartVouchersJob:
       settings-key: SmartVouchersService-Redis-ConnectionString
   VoucherLockTimeOut:
     settings-key: SmartVouchersService-VoucherLockTimeOut
-  JobIdlePeriod:
-    settings-key: SmartVouchersJob-JobIdlePeriod
+  ReservedVouchersTimeoutJobIdlePeriod:
+    settings-key: SmartVouchersJob-ReservedVouchersTimeoutJobIdlePeriod
+  ExpiredVouchersJobIdlePeriod:
+    settings-key: SmartVouchersJob-ExpiredVouchersJobIdlePeriod
   GeneratePaymentTimeoutPeriod:
     settings-key: SmartVouchersJob-GeneratePaymentTimeoutPeriod
   FinishPaymentTimeoutPeriod:
