@@ -120,7 +120,10 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 if (request.OnlyActive)
                 {
                     var now = DateTime.UtcNow;
-                    query = query.Where(c => c.FromDate <= now && (!c.ToDate.HasValue || c.ToDate.Value > now));
+                    query = query.Where(c =>
+                        c.FromDate <= now
+                        && (!c.ToDate.HasValue || c.ToDate.Value > now)
+                        && c.BoughtVouchersCount < c.VouchersTotalCount);
                 }
 
                 if (request.CreatedBy.HasValue && request.CreatedBy.Value != Guid.Empty)
