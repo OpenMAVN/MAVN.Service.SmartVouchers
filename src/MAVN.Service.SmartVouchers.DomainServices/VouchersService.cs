@@ -175,6 +175,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         Amount = campaign.VoucherPrice,
                         Currency = campaign.Currency,
                         PartnerId = campaign.PartnerId,
+                        ExternalPaymentEntityId = voucher.ShortCode,
                     });
 
                 if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.None)
