@@ -338,6 +338,12 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         continue;
                 }
 
+                var paymentManagementError = await _paymentManagementClient.Api.CancelPaymentAsync(
+                    new CancelPaymentRequest { PaymentRequestId = paymentRequestId.Value });
+
+                if (paymentManagementError != PaymentCancellationErrorCode.None)
+                    _log.Warning("Error when trying to cancel payment in payment management", context: new { paymentRequestId, paymentManagementError });
+
                 await CancelReservationAsync(voucher.ShortCode);
             }
         }
