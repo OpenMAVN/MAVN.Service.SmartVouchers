@@ -8,10 +8,11 @@
         /// <summary>
         /// Total count of vouchers in the system which are for campaigns with status published
         /// </summary>
-        public int PublishedCampaignsVouchersTotalCount { get; set; }
+        public long PublishedCampaignsVouchersTotalCount { get; set; }
+
         /// <summary>
         /// Total count of vouchers in the system which are for campaigns with status published and are currently active
         /// </summary>
-        public int ActiveCampaignsVouchersTotalCount { get; set; }
+        public long ActiveCampaignsVouchersTotalCount { get; set; }
     }
 }

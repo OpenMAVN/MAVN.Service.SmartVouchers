@@ -197,7 +197,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         }
 
 
-        public Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        public Task<(long publishedCampaingsVouchersCount, long activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
         {
             return _campaignsRepository.GetPublishedAndActiveCampaignsVouchersCountAsync();
         }

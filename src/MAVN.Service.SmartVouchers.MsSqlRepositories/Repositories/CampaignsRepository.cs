@@ -149,7 +149,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task<(int publishedCampaingsVouchersCount, int activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
+        public async Task<(long publishedCampaingsVouchersCount, long activeCampaingsVouchersCount)> GetPublishedAndActiveCampaignsVouchersCountAsync()
         {
             using (var context = _contextFactory.CreateDataContext())
             {
@@ -157,13 +157,13 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
 
                 var publishedCampaignsVouchersCount = await context.VoucherCampaigns
                     .Where(c => c.State == CampaignState.Published)
-                    .Select(c => c.VouchersTotalCount)
+                    .Select(c => (long)c.VouchersTotalCount)
                     .SumAsync();
 
                 var activeCampaignsVouchersCount = await context.VoucherCampaigns
                     .Where(c => c.State == CampaignState.Published && c.FromDate <= now &&
                                 (c.ToDate == null || c.ToDate > now))
-                    .Select(c => c.VouchersTotalCount)
+                    .Select(c => (long)c.VouchersTotalCount)
                     .SumAsync();
 
                 return (publishedCampaignsVouchersCount, activeCampaignsVouchersCount);
