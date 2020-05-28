@@ -98,10 +98,11 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
         {
             using (var context = _contextFactory.CreateDataContext())
             {
+                var hasPartnersFilter = request.PartnerIds != null && request.PartnerIds.Any();
                 var query = context.VoucherCampaigns
                     .Where(c => c.State != CampaignState.Deleted);
 
-                if (request.PartnerIds != null && request.PartnerIds.Any())
+                if (hasPartnersFilter)
                 {
                     query = query.Where(c => request.PartnerIds.Contains(c.PartnerId));
                 }
@@ -131,14 +132,35 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     query = query.Where(p => p.CreatedBy == request.CreatedBy.ToString());
                 }
 
-                var result = await query
+                query = query
                     .Include(c => c.LocalizedContents)
-                    .AsNoTracking()
-                    .OrderByDescending(i => i.CreationDate)
-                    .Skip(request.Skip)
-                    .Take(request.Take)
-                    .ToListAsync();
+                    .AsNoTracking();
 
+                List<VoucherCampaignEntity> result;
+
+                if (hasPartnersFilter && request.PartnerIds.Length > 1)
+                {
+                    var partnersOrders = new Dictionary<Guid, int>();
+                    for (var i = 0; i < request.PartnerIds.Length; i++)
+                    {
+                        partnersOrders.Add(request.PartnerIds[i], i);
+                    }
+                    //This is done in memory because we cannot apply this ordering and paging on db level (can't be translated)
+                    result = await query.ToListAsync();
+                    result = result
+                        .OrderBy(p => partnersOrders[p.PartnerId])
+                        .Skip(request.Skip)
+                        .Take(request.Take)
+                        .ToList();
+                }
+                else
+                {
+                    result = await query
+                        .OrderByDescending(i => i.CreationDate)
+                        .Skip(request.Skip)
+                        .Take(request.Take)
+                        .ToListAsync();
+                }
                 var totalCount = await query.CountAsync();
 
                 return new CampaignsPage
