@@ -29,6 +29,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
         private readonly IRedisLocksService _redisLocksService;
         private readonly IRabbitPublisher<SmartVoucherSoldEvent> _voucherSoldPublisher;
+        private readonly IRabbitPublisher<SmartVoucherUsedEvent> _voucherUsedPublisher;
         private readonly ILog _log;
         private readonly TimeSpan _lockTimeOut;
 
@@ -40,6 +41,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
             IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
+            IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher,
             TimeSpan lockTimeOut)
         {
             _paymentManagementClient = paymentManagementClient;
@@ -50,6 +52,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _voucherSoldPublisher = voucherSoldPublisher;
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
+            _voucherUsedPublisher = voucherUsedPublisher;
         }
 
         public async Task<ProcessingVoucherError> ProcessPaymentRequestAsync(Guid paymentRequestId)
@@ -235,22 +238,21 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (voucher == null)
                 return RedeemVoucherError.VoucherNotFound;
 
+            if (voucher.ValidationCode != validationCode)
+                return RedeemVoucherError.WrongValidationCode;
+
             var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, false);
             if (campaign == null)
                 return RedeemVoucherError.VoucherCampaignNotFound;
 
-            if (campaign.State != CampaignState.Published
-                || DateTime.UtcNow < campaign.FromDate
-                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+            if (!IsCampaignStateValid(campaign) || !IsCampaignDateValid(campaign))
                 return RedeemVoucherError.VoucherCampaignNotActive;
-
-            if (voucher.ValidationCode != validationCode)
-                return RedeemVoucherError.WrongValidationCode;
 
             voucher.Status = VoucherStatus.Used;
             voucher.RedemptionDate = DateTime.UtcNow;
 
             await _vouchersRepository.UpdateAsync(voucher);
+            await PublishVoucherUsedEvent(campaign, voucher);
 
             return RedeemVoucherError.None;
         }
@@ -354,6 +356,13 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             await _vouchersRepository.SetVouchersFromCampaignsAsExpired(finishedCampaignsIds);
         }
 
+        private bool IsCampaignStateValid(VoucherCampaign campaign)
+            => campaign.State != CampaignState.Published;
+
+        private bool IsCampaignDateValid(VoucherCampaign campaign)
+            => DateTime.UtcNow < campaign.FromDate
+               || (campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow);
+
         private async Task PublishVoucherSoldEvent(Guid? paymentRequestId, VoucherCampaign voucherCampaign, Voucher voucher)
         {
             await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
@@ -369,10 +378,19 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             });
         }
 
-        private string GenerateShortCodeFromId(long voucherId)
+        private async Task PublishVoucherUsedEvent(VoucherCampaign voucherCampaign, Voucher voucher)
         {
-            var bytes = BitConverter.GetBytes(voucherId);
-            return Base32Helper.Encode(bytes);
+            await _voucherUsedPublisher.PublishAsync(new SmartVoucherUsedEvent()
+            {
+                CustomerId = voucher.OwnerId.Value,
+                Timestamp = DateTime.UtcNow,
+                PartnerId = voucherCampaign.PartnerId,
+                CampaignId = voucher.CampaignId,
+                Amount = voucherCampaign.VoucherPrice,
+                Currency = voucherCampaign.Currency,
+                // TODO: Need to set value LinkedCustomerId
+                //LinkedCustomerId = 
+            });
         }
 
         private (string, string) GenerateValidation()
@@ -385,6 +403,12 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             var codeHash = Convert.ToBase64String(sha1);
 
             return (validationCode, codeHash);
+        }
+
+        private string GenerateShortCodeFromId(long voucherId)
+        {
+            var bytes = BitConverter.GetBytes(voucherId);
+            return Base32Helper.Encode(bytes);
         }
 
         private async Task<ProcessingVoucherError?> CancelReservationAsync(string shortCode)
