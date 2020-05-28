@@ -13,7 +13,8 @@ namespace MAVN.Service.SmartVouchers.Modules
     [UsedImplicitly]
     public class RabbitMqModule : Module
     {
-        private const string PubExchangeName = "lykke.smart-vouchers.vouchersold";
+        private const string PubVoucherSoldExchangeName = "lykke.smart-vouchers.vouchersold";
+        private const string PubVoucherUsedExchangeName = "lykke.smart-vouchers.voucherused";
         private const string SubExchangeName = "lykke.payment.completed"; // TODO pass proper exchange name
 
         private readonly RabbitMqSettings _settings;
@@ -37,12 +38,15 @@ namespace MAVN.Service.SmartVouchers.Modules
         {
             builder.RegisterJsonRabbitPublisher<SmartVoucherSoldEvent>(
                 _settings.Publishers.ConnectionString,
-                PubExchangeName);
+                PubVoucherSoldExchangeName);
+            builder.RegisterJsonRabbitPublisher<SmartVoucherUsedEvent>(
+                _settings.Publishers.ConnectionString,
+                PubVoucherUsedExchangeName);
         }
 
         private void RegisterRabbitMqSubscribers(ContainerBuilder builder)
         {
-            builder.RegisterJsonRabbitSubscriber<RabbitSubscriber, PaymentCompletedEvent>( 
+            builder.RegisterJsonRabbitSubscriber<RabbitSubscriber, PaymentCompletedEvent>(
                 _settings.Subscribers.ConnectionString,
                 SubExchangeName,
                 nameof(SmartVouchers).ToLower()); // this could be changed if needed

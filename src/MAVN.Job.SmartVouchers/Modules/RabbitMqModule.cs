@@ -14,7 +14,8 @@ namespace MAVN.Job.SmartVouchers.Modules
     [UsedImplicitly]
     public class RabbitMqModule : Module
     {
-        private const string PubExchangeName = "lykke.smart-vouchers.vouchersold";
+        private const string PubVoucherSoldExchangeName = "lykke.smart-vouchers.vouchersold";
+        private const string PubVoucherUsedExchangeName = "lykke.smart-vouchers.voucherused";
         private const string SubExchangeName = "lykke.payment.completed"; // TODO pass proper exchange name
 
         private readonly RabbitMqSettings _settings;
@@ -38,7 +39,10 @@ namespace MAVN.Job.SmartVouchers.Modules
         {
             builder.RegisterJsonRabbitPublisher<SmartVoucherSoldEvent>(
                 _settings.Publishers.ConnectionString,
-                PubExchangeName);
+                PubVoucherSoldExchangeName);
+            builder.RegisterJsonRabbitPublisher<SmartVoucherUsedEvent>(
+                _settings.Publishers.ConnectionString,
+                PubVoucherUsedExchangeName);
         }
 
         private void RegisterRabbitMqSubscribers(ContainerBuilder builder)

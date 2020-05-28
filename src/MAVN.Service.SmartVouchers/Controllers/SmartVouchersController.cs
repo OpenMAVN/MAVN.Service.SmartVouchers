@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -110,7 +111,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
         /// <param name="model">The model that describes voucher redemption request.</param>
         [HttpPost("usage")]
         [ProducesResponseType(typeof(RedeemVoucherErrorCodes), (int)HttpStatusCode.OK)]
-        public async Task<RedeemVoucherErrorCodes> RedeemVoucherAsync([FromBody] VoucherRedeptionModel model)
+        public async Task<RedeemVoucherErrorCodes> RedeemVoucherAsync([FromBody][Required] VoucherRedeptionModel model)
         {
             var result = await _vouchersService.RedeemVoucherAsync(model.VoucherShortCode, model.VoucherValidationCode);
 

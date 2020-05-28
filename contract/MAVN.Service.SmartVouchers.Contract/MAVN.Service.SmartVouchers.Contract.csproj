@@ -32,4 +32,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MAVN.Numerics" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>
