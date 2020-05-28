@@ -41,7 +41,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
             IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
-            TimeSpan lockTimeOut, IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher)
+            IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher,
+            TimeSpan lockTimeOut)
         {
             _paymentManagementClient = paymentManagementClient;
             _vouchersRepository = vouchersRepository;

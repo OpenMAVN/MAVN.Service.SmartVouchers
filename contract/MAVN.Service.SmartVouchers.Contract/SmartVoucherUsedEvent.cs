@@ -41,7 +41,7 @@ namespace MAVN.Service.SmartVouchers.Contract
         /// <summary>
         /// Amount
         /// </summary>
-        public Money18 Amount { get; set; }
+        public decimal Amount { get; set; }
 
         /// <summary>
         /// Currency
