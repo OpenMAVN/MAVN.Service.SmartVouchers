@@ -16,9 +16,6 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Responses
         /// <summary>Voucher short code</summary>
         public string ShortCode { get; set; }
 
-        /// <summary>Voucher validation code hash</summary>
-        public string ValidationCodeHash { get; set; }
-
         /// <summary>Voucher campaign id</summary>
         public Guid CampaignId { get; set; }
 

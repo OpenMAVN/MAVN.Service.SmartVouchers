@@ -16,9 +16,8 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Entities
         [Column("short_code")]
         public string ShortCode { get; set; }
 
-        [Column("validation_code_hash")]
-        [Required]
-        public string ValidationCodeHash { get; set; }
+        [Column("seller_id")]
+        public Guid? SellerId { get; set; }
 
         [Column("campaign_id")]
         [Required]

@@ -113,7 +113,7 @@ namespace MAVN.Service.SmartVouchers.Controllers
         [ProducesResponseType(typeof(RedeemVoucherErrorCodes), (int)HttpStatusCode.OK)]
         public async Task<RedeemVoucherErrorCodes> RedeemVoucherAsync([FromBody][Required] VoucherRedeptionModel model)
         {
-            var result = await _vouchersService.RedeemVoucherAsync(model.VoucherShortCode, model.VoucherValidationCode);
+            var result = await _vouchersService.RedeemVoucherAsync(model.VoucherShortCode, model.VoucherValidationCode, model.SellerCustomerId);
 
             return _mapper.Map<RedeemVoucherErrorCodes>(result);
         }
