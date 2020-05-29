@@ -15,5 +15,9 @@
         VoucherCampaignNotFound,
         /// <summary>Voucher campaign not active</summary>
         VoucherCampaignNotActive,
+        /// <summary>The passed seller id does not have a linked partner id</summary>
+        SellerCustomerIsNotALinkedPartner,
+        /// <summary>The passed seller id does not match the voucher issuer id</summary>
+        SellerCustomerIsNotTheVoucherIssuer,
     }
 }

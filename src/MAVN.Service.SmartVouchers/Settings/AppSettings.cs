@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Lykke.Sdk.Settings;
+using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 
 namespace MAVN.Service.SmartVouchers.Settings
@@ -10,5 +11,7 @@ namespace MAVN.Service.SmartVouchers.Settings
         public SmartVouchersSettings SmartVouchersService { get; set; }
 
         public PaymentManagementServiceClientSettings PaymentManagementServiceClient { get; set; }
+
+        public PartnerManagementServiceClientSettings PartnerManagementServiceClient { get; set; }
     }
 }

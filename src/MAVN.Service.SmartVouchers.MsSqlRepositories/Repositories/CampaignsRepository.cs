@@ -149,6 +149,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                     result = await query.ToListAsync();
                     result = result
                         .OrderBy(p => partnersOrders[p.PartnerId])
+                        .ThenByDescending(i => i.CreationDate)
                         .Skip(request.Skip)
                         .Take(request.Take)
                         .ToList();

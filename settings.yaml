@@ -76,3 +76,6 @@ MonitoringServiceClient:
 PaymentManagementServiceClient:
     ServiceUrl:
         settings-key: PaymentManagementServiceUrl
+PartnerManagementServiceClient:
+    ServiceUrl:
+        settings-key: PartnerManagementServiceUrl

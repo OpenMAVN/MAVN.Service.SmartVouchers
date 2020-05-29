@@ -5,6 +5,7 @@ using Lykke.Sdk.Health;
 using Lykke.SettingsReader;
 using MAVN.Job.SmartVouchers.Services;
 using MAVN.Job.SmartVouchers.Settings;
+using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.SmartVouchers.Domain.Services;
 using MAVN.Service.SmartVouchers.DomainServices;
@@ -43,6 +44,7 @@ namespace MAVN.Job.SmartVouchers.Modules
                 .SingleInstance();
 
             builder.RegisterPaymentManagementClient(_settings.PaymentManagementServiceClient, null);
+            builder.RegisterPartnerManagementClient(_settings.PartnerManagementServiceClient, null);
         }
     }
 }

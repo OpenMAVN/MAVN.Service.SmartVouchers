@@ -1,5 +1,6 @@
 ﻿using Lykke.Sdk.Settings;
 using MAVN.Job.SmartVouchers.Settings.JobSettings;
+using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 
 namespace MAVN.Job.SmartVouchers.Settings
@@ -9,5 +10,7 @@ namespace MAVN.Job.SmartVouchers.Settings
         public SmartVouchersJobSettings SmartVouchersJob { get; set; }
 
         public PaymentManagementServiceClientSettings PaymentManagementServiceClient { get; set; }
+
+        public PartnerManagementServiceClientSettings PartnerManagementServiceClient { get; set; }
     }
 }
