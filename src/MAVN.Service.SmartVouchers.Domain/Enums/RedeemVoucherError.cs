@@ -7,5 +7,7 @@
         WrongValidationCode,
         VoucherCampaignNotFound,
         VoucherCampaignNotActive,
+        SellerCustomerIsNotALinkedPartner,
+        SellerCustomerIsNotTheVoucherIssuer,
     }
 }

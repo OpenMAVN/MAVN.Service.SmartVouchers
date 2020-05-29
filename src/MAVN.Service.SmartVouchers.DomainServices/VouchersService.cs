@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
+using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.PaymentManagement.Client.Models.Requests;
 using MAVN.Service.PaymentManagement.Client.Models.Responses;
@@ -24,6 +25,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private const string PendingPaymentStatus = "pending";
 
         private readonly IPaymentManagementClient _paymentManagementClient;
+        private readonly IPartnerManagementClient _partnerManagementClient;
         private readonly IVouchersRepository _vouchersRepository;
         private readonly ICampaignsRepository _campaignsRepository;
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
@@ -35,6 +37,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public VouchersService(
             IPaymentManagementClient paymentManagementClient,
+            IPartnerManagementClient partnerManagementClient,
             IVouchersRepository vouchersRepository,
             ICampaignsRepository campaignsRepository,
             IPaymentRequestsRepository paymentRequestsRepository,
@@ -45,6 +48,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             TimeSpan lockTimeOut)
         {
             _paymentManagementClient = paymentManagementClient;
+            _partnerManagementClient = partnerManagementClient;
             _vouchersRepository = vouchersRepository;
             _campaignsRepository = campaignsRepository;
             _paymentRequestsRepository = paymentRequestsRepository;
@@ -246,6 +250,17 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             if (!IsCampaignStateValid(campaign) || !IsCampaignDateValid(campaign))
                 return RedeemVoucherError.VoucherCampaignNotActive;
+
+            if (sellerCustomerId.HasValue)
+            {
+                var linkedPartner = await _partnerManagementClient.Linking.GetLinkedPartnerAsync(sellerCustomerId.Value);
+
+                if (!linkedPartner.HasValue)
+                    return RedeemVoucherError.SellerCustomerIsNotALinkedPartner;
+
+                if(linkedPartner.Value != campaign.PartnerId)
+                    return RedeemVoucherError.SellerCustomerIsNotTheVoucherIssuer;
+            }
 
             voucher.Status = VoucherStatus.Used;
             voucher.RedemptionDate = DateTime.UtcNow;
