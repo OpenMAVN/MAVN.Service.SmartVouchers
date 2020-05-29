@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
@@ -17,5 +18,10 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
         /// Voucher validation code
         /// </summary>
         public string VoucherValidationCode { get; set; }
+
+        /// <summary>
+        /// Id of the seller
+        /// </summary>
+        public Guid? SellerCustomerId { get; set; }
     }
 }

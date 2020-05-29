@@ -10,7 +10,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
         Task<ProcessingVoucherError> ProcessPaymentRequestAsync(Guid paymentRequestId);
         Task<VoucherReservationResult> ReserveVoucherAsync(Guid voucherCampaignId, Guid ownerId);
         Task<ProcessingVoucherError> CancelVoucherReservationAsync(string shortCode);
-        Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode);
+        Task<RedeemVoucherError> RedeemVoucherAsync(string voucherShortCode, string validationCode, Guid? sellerCustomerId);
         Task<TransferVoucherError> TransferVoucherAsync(
             string voucherShortCode,
             Guid oldOwnerId,
