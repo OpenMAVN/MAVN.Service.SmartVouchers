@@ -99,6 +99,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
                 return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
 
+
+
             var voucherPriceIsZero = campaign.VoucherPrice == 0;
             var voucherCampaignIdStr = voucherCampaignId.ToString();
             for (int i = 0; i < MaxAttemptsCount; ++i)
@@ -112,6 +114,10 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     await Task.Delay(_lockTimeOut);
                     continue;
                 }
+
+                var hasAnyReservedVouchers = await _vouchersRepository.AnyReservedVouchersAsync(ownerId);
+                if (hasAnyReservedVouchers)
+                    return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher };
 
                 var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
                 Voucher voucher = null;

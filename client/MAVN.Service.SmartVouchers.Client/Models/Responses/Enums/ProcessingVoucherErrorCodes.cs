@@ -17,5 +17,7 @@
         VoucherNotFound,
         /// <summary>Invalid partner payment configuration</summary>
         InvalidPartnerPaymentConfiguration,
+        /// <summary>The customer has already reserved another voucher</summary>
+        CustomerHaveAnotherReservedVoucher,
     }
 }

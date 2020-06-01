@@ -218,5 +218,16 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> AnyReservedVouchersAsync(Guid customerId)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var result = await context.Vouchers
+                    .AnyAsync(x => x.OwnerId == customerId && x.Status == VoucherStatus.Reserved);
+
+                return result;
+            }
+        }
     }
 }
