@@ -8,5 +8,6 @@
         NoAvailableVouchers,
         VoucherNotFound,
         InvalidPartnerPaymentConfiguration,
+        CustomerHaveAnotherReservedVoucher,
     }
 }

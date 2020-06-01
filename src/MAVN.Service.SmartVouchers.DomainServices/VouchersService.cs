@@ -99,6 +99,10 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
                 return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
 
+            var hasAnyReservedVouchers = await _vouchersRepository.AnyReservedVouchersAsync(ownerId);
+            if (hasAnyReservedVouchers)
+                return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher };
+
             var voucherPriceIsZero = campaign.VoucherPrice == 0;
             var voucherCampaignIdStr = voucherCampaignId.ToString();
             for (int i = 0; i < MaxAttemptsCount; ++i)
