@@ -250,6 +250,9 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (voucher.ValidationCode != validationCode)
                 return RedeemVoucherError.WrongValidationCode;
 
+            if (voucher.Status != VoucherStatus.Sold)
+                return RedeemVoucherError.VoucherIsNotInCorrectStatusToBeRedeemed;
+
             var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, false);
             if (campaign == null)
                 return RedeemVoucherError.VoucherCampaignNotFound;

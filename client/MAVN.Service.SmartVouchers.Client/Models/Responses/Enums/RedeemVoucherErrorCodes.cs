@@ -19,5 +19,7 @@
         SellerCustomerIsNotALinkedPartner,
         /// <summary>The passed seller id does not match the voucher issuer id</summary>
         SellerCustomerIsNotTheVoucherIssuer,
+        /// <summary>Cannot redeem voucher with the current status</summary>
+        VoucherIsNotInCorrectStatusToBeRedeemed,
     }
 }
