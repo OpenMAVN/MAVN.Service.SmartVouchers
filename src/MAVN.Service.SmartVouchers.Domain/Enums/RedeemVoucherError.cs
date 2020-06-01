@@ -9,5 +9,6 @@
         VoucherCampaignNotActive,
         SellerCustomerIsNotALinkedPartner,
         SellerCustomerIsNotTheVoucherIssuer,
+        VoucherIsNotInCorrectStatusToBeRedeemed,
     }
 }
