@@ -59,7 +59,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 return UpdateCampaignError.VoucherCampaignNotFound;
             }
 
-            if( oldCampaign.State == CampaignState.Published && oldCampaign.FromDate <= DateTime.UtcNow)
+            if (!IsCampaignEditable(oldCampaign, campaign))
                 return UpdateCampaignError.CampaignAlreadyStarted;
 
             if (campaign.VouchersTotalCount < oldCampaign.BoughtVouchersCount)
@@ -206,6 +206,25 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             var now = DateTime.UtcNow;
             return _campaignsRepository.SetFinishedCampaignsAsCompletedAsync(now);
+        }
+
+        private bool IsCampaignEditable(VoucherCampaign existingCampaign, VoucherCampaign updatedCampaign)
+        {
+            if (existingCampaign.State != CampaignState.Published || existingCampaign.FromDate > DateTime.UtcNow)
+                return true;
+
+            if (existingCampaign.VoucherPrice != updatedCampaign.VoucherPrice ||
+                existingCampaign.VouchersTotalCount != updatedCampaign.VouchersTotalCount ||
+                existingCampaign.Currency != updatedCampaign.Currency ||
+                existingCampaign.PartnerId != updatedCampaign.PartnerId ||
+                existingCampaign.ToDate != updatedCampaign.ToDate ||
+                existingCampaign.FromDate != updatedCampaign.FromDate ||
+                existingCampaign.State != updatedCampaign.State)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
