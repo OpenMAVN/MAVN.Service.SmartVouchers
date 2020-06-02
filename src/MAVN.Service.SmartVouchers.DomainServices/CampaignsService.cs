@@ -59,7 +59,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 return UpdateCampaignError.VoucherCampaignNotFound;
             }
 
-            if( oldCampaign.State == CampaignState.Published && oldCampaign.FromDate <= DateTime.UtcNow)
+            if (!IsCampaignEditable(oldCampaign, campaign))
                 return UpdateCampaignError.CampaignAlreadyStarted;
 
             if (campaign.VouchersTotalCount < oldCampaign.BoughtVouchersCount)
@@ -206,6 +206,35 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             var now = DateTime.UtcNow;
             return _campaignsRepository.SetFinishedCampaignsAsCompletedAsync(now);
+        }
+
+        private bool IsCampaignEditable(VoucherCampaign existingCampaign, VoucherCampaign updatedCampaign)
+        {
+            if (existingCampaign.State != CampaignState.Published || existingCampaign.FromDate > DateTime.UtcNow)
+                return true;
+
+            if (existingCampaign.VoucherPrice != updatedCampaign.VoucherPrice)
+                return false;
+
+            if (existingCampaign.VouchersTotalCount != updatedCampaign.VouchersTotalCount)
+                return false;
+
+            if (existingCampaign.Currency != updatedCampaign.Currency)
+                return false;
+
+            if (existingCampaign.PartnerId != updatedCampaign.PartnerId)
+                return false;
+
+            if (existingCampaign.ToDate != updatedCampaign.ToDate)
+                return false;
+
+            if (existingCampaign.FromDate != updatedCampaign.FromDate)
+                return false;
+
+            if (existingCampaign.State != updatedCampaign.State)
+                return false;
+
+            return true;
         }
     }
 }
