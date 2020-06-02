@@ -201,5 +201,11 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             return _campaignsRepository.GetPublishedAndActiveCampaignsVouchersCountAsync();
         }
+
+        public Task MarkCampaignsAsCompletedAsync()
+        {
+            var now = DateTime.UtcNow;
+            return _campaignsRepository.SetFinishedCampaignsAsCompletedAsync(now);
+        }
     }
 }

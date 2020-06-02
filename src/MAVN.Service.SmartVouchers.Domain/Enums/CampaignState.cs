@@ -5,5 +5,6 @@
         Draft = 0,
         Published,
         Deleted,
+        Completed,
     }
 }

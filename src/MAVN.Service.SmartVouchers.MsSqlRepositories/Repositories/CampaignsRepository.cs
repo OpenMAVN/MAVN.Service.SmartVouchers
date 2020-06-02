@@ -193,18 +193,33 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task<Guid[]> GetFinishedCampaignsIdsAsync()
+        public async Task<Guid[]> GetFinishedCampaignsIdsAsync(DateTime now)
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var now = DateTime.UtcNow;
-
                 var result = await context.VoucherCampaigns
                     .Where(c => c.ToDate <= now)
                     .Select(x => x.Id)
                     .ToArrayAsync();
 
                 return result;
+            }
+        }
+
+        public async Task SetFinishedCampaignsAsCompletedAsync(DateTime now)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var campaigns = context.VoucherCampaigns
+                    .Where(c => c.ToDate <= now && c.State == CampaignState.Published);
+
+                foreach (var campaign in campaigns)
+                {
+                    campaign.State = CampaignState.Completed;
+                    context.VoucherCampaigns.Update(campaign);
+                }
+
+                await context.SaveChangesAsync();
             }
         }
     }

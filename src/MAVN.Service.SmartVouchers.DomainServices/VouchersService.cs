@@ -375,7 +375,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         public async Task MarkVouchersFromFinishedCampaignsAsExpired()
         {
-            var finishedCampaignsIds = await _campaignsRepository.GetFinishedCampaignsIdsAsync();
+            var finishedCampaignsIds = await _campaignsRepository.GetFinishedCampaignsIdsAsync(DateTime.UtcNow);
             await _vouchersRepository.SetVouchersFromCampaignsAsExpired(finishedCampaignsIds);
         }
 
