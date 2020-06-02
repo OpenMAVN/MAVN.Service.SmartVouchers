@@ -213,26 +213,16 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (existingCampaign.State != CampaignState.Published || existingCampaign.FromDate > DateTime.UtcNow)
                 return true;
 
-            if (existingCampaign.VoucherPrice != updatedCampaign.VoucherPrice)
+            if (existingCampaign.VoucherPrice != updatedCampaign.VoucherPrice ||
+                existingCampaign.VouchersTotalCount != updatedCampaign.VouchersTotalCount ||
+                existingCampaign.Currency != updatedCampaign.Currency ||
+                existingCampaign.PartnerId != updatedCampaign.PartnerId ||
+                existingCampaign.ToDate != updatedCampaign.ToDate ||
+                existingCampaign.FromDate != updatedCampaign.FromDate ||
+                existingCampaign.State != updatedCampaign.State)
+            {
                 return false;
-
-            if (existingCampaign.VouchersTotalCount != updatedCampaign.VouchersTotalCount)
-                return false;
-
-            if (existingCampaign.Currency != updatedCampaign.Currency)
-                return false;
-
-            if (existingCampaign.PartnerId != updatedCampaign.PartnerId)
-                return false;
-
-            if (existingCampaign.ToDate != updatedCampaign.ToDate)
-                return false;
-
-            if (existingCampaign.FromDate != updatedCampaign.FromDate)
-                return false;
-
-            if (existingCampaign.State != updatedCampaign.State)
-                return false;
+            }
 
             return true;
         }
