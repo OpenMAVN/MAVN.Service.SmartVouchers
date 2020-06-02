@@ -19,5 +19,7 @@ namespace MAVN.Job.SmartVouchers.Settings.JobSettings
         public TimeSpan GeneratePaymentTimeoutPeriod { get; set; }
 
         public TimeSpan FinishPaymentTimeoutPeriod { get; set; }
+
+        public TimeSpan CompletedCampaignsJobIdlePeriod { get; set; }
     }
 }

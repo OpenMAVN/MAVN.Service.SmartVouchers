@@ -11,5 +11,7 @@
         Published,
         /// <summary>Deleted</summary>
         Deleted,
+        /// <summary>Completed</summary>
+        Completed,
     }
 }

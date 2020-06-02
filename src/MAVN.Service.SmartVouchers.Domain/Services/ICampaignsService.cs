@@ -18,5 +18,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
 
         Task<(long publishedCampaingsVouchersCount, long activeCampaingsVouchersCount)>
             GetPublishedAndActiveCampaignsVouchersCountAsync();
+
+        Task MarkCampaignsAsCompletedAsync();
     }
 }

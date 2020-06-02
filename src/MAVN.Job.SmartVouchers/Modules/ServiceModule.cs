@@ -31,6 +31,16 @@ namespace MAVN.Job.SmartVouchers.Modules
                 .AutoActivate()
                 .SingleInstance();
 
+            builder.RegisterType<CampaignsService>()
+                .As<ICampaignsService>()
+                .AutoActivate()
+                .SingleInstance();
+
+            builder.RegisterType<FileService>()
+                .As<IFileService>()
+                .AutoActivate()
+                .SingleInstance();
+
             builder.Register(context =>
             {
                 var connectionMultiplexer =

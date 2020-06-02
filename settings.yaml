@@ -62,6 +62,8 @@ SmartVouchersJob:
     settings-key: SmartVouchersJob-GeneratePaymentTimeoutPeriod
   FinishPaymentTimeoutPeriod:
     settings-key: SmartVouchersJob-FinishPaymentTimeoutPeriod
+  CompletedCampaignsJobIdlePeriod:
+    settings-key: SmartVouchersJob-CompletedCampaignsJobIdlePeriod
 SlackNotifications:
     AzureQueue:
         ConnectionString:

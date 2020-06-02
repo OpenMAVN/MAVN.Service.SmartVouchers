@@ -48,6 +48,11 @@ namespace MAVN.Job.SmartVouchers.Modules
                 .WithParameter("idlePeriod", _settings.SmartVouchersJob.ExpiredVouchersJobIdlePeriod)
                 .As<IStartStop>()
                 .SingleInstance();
+
+            builder.RegisterType<CompletedCampaignsManager>()
+                .WithParameter("idlePeriod", _settings.SmartVouchersJob.CompletedCampaignsJobIdlePeriod)
+                .As<IStartStop>()
+                .SingleInstance();
         }
     }
 }
