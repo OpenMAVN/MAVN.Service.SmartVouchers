@@ -32,6 +32,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private readonly IRedisLocksService _redisLocksService;
         private readonly IRabbitPublisher<SmartVoucherSoldEvent> _voucherSoldPublisher;
         private readonly IRabbitPublisher<SmartVoucherUsedEvent> _voucherUsedPublisher;
+        private readonly IRabbitPublisher<SmartVoucherTransferredEvent> _voucherTransferredPublisher;
         private readonly ILog _log;
         private readonly TimeSpan _lockTimeOut;
 
@@ -45,6 +46,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             IRedisLocksService redisLocksService,
             IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
             IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher,
+            IRabbitPublisher<SmartVoucherTransferredEvent> voucherTransferredPublisher,
             TimeSpan lockTimeOut)
         {
             _paymentManagementClient = paymentManagementClient;
@@ -57,6 +59,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
             _voucherUsedPublisher = voucherUsedPublisher;
+            _voucherTransferredPublisher = voucherTransferredPublisher;
         }
 
         public async Task<ProcessingVoucherError> ProcessPaymentRequestAsync(Guid paymentRequestId)
@@ -290,15 +293,21 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             if (voucher == null)
                 return TransferVoucherError.VoucherNotFound;
 
-            if (voucher.Status != VoucherStatus.InStock)
-                return TransferVoucherError.VoucherIsUsed;
+            if (voucher.Status != VoucherStatus.Sold)
+                return TransferVoucherError.VoucherIsNotInTheCorrectStateToTransfer;
+
             if (voucher.OwnerId != oldOwnerId)
                 return TransferVoucherError.NotAnOwner;
+
+            var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, false);
+            if (campaign == null)
+                return TransferVoucherError.VoucherCampaignNotFound;
 
             voucher.OwnerId = newOwnerId;
             var validationCode = GenerateValidation();
 
             await _vouchersRepository.UpdateAsync(voucher, validationCode);
+            await PublishVoucherTransferredEvent(campaign, voucher, oldOwnerId);
 
             return TransferVoucherError.None;
         }
@@ -412,6 +421,21 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 Amount = voucherCampaign.VoucherPrice,
                 Currency = voucherCampaign.Currency,
                 LinkedCustomerId = voucher.SellerId,
+            });
+        }
+
+        private async Task PublishVoucherTransferredEvent(VoucherCampaign voucherCampaign, Voucher voucher, Guid oldOwnerId)
+        {
+            await _voucherTransferredPublisher.PublishAsync(new SmartVoucherTransferredEvent
+            {
+                Amount = voucherCampaign.VoucherPrice,
+                Currency = voucherCampaign.Currency,
+                PartnerId = voucherCampaign.PartnerId,
+                Timestamp = DateTime.UtcNow,
+                CampaignId = voucher.CampaignId,
+                VoucherShortCode = voucher.ShortCode,
+                NewCustomerId = voucher.OwnerId.Value,
+                OldCustomerId = oldOwnerId,
             });
         }
 
