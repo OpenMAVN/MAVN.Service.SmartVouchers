@@ -11,7 +11,11 @@
         VoucherNotFound,
         /// <summary>Not an owner</summary>
         NotAnOwner,
-        /// <summary>Voucher is already used</summary>
-        VoucherIsUsed,
+        /// <summary>Voucher cannot be transferred because it is not in a correct state</summary>
+        VoucherIsNotInTheCorrectStateToTransfer,
+        /// <summary>
+        /// Campaign is missing for smart voucher
+        /// </summary>
+        VoucherCampaignNotFound,
     }
 }

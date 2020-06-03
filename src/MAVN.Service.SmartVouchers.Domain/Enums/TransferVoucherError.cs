@@ -5,6 +5,7 @@
         None,
         VoucherNotFound,
         NotAnOwner,
-        VoucherIsUsed,
+        VoucherIsNotInTheCorrectStateToTransfer,
+        VoucherCampaignNotFound,
     }
 }
