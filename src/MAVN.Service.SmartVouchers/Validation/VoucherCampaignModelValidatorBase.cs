@@ -33,6 +33,16 @@ namespace MAVN.Service.SmartVouchers.Validation
             RuleFor(x => x.FromDate)
                 .Must(x => x != default)
                 .WithMessage(x => $"{nameof(x.FromDate)} required");
+
+            RuleFor(x => x.ExpirationDate)
+                .Must(x => x != default)
+                .WithMessage(x => $"{nameof(x.ExpirationDate)} required")
+                .GreaterThan(x => x.ToDate)
+                .WithMessage(x => $"{nameof(x.ExpirationDate)} must be after {nameof(x.ToDate)}")
+                .When(x => x.ToDate != default)
+                .Must(x => x == default)
+                .When(x => x.ToDate == default, ApplyConditionTo.CurrentValidator)
+                .WithMessage(x => $"{nameof(x.ExpirationDate)} must be empty when {nameof(x.ToDate)} is empty");
         }
     }
 }

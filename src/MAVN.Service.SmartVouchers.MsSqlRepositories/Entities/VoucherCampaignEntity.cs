@@ -43,6 +43,9 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Entities
         [Column("to_date")]
         public DateTime? ToDate { get; set; }
 
+        [Column("expiration_date")]
+        public DateTime? ExpirationDate { get; set; }
+
         [Column("creation_date")]
         public DateTime CreationDate { get; set; }
 

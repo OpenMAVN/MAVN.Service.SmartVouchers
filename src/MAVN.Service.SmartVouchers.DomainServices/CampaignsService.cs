@@ -219,6 +219,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 existingCampaign.PartnerId != updatedCampaign.PartnerId ||
                 existingCampaign.ToDate != updatedCampaign.ToDate ||
                 existingCampaign.FromDate != updatedCampaign.FromDate ||
+                existingCampaign.ExpirationDate != updatedCampaign.ExpirationDate ||
                 existingCampaign.State != updatedCampaign.State)
             {
                 return false;

@@ -22,6 +22,6 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
         Task ProcessStuckReservedVouchersAsync(TimeSpan generatePaymentTimeoutPeriod,
             TimeSpan finishPaymentTimeoutPeriod);
 
-        Task MarkVouchersFromFinishedCampaignsAsExpired();
+        Task MarkVouchersFromExpiredCampaignsAsExpired();
     }
 }
