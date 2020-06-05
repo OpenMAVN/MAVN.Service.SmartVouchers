@@ -35,8 +35,6 @@ namespace MAVN.Service.SmartVouchers.Validation
                 .WithMessage(x => $"{nameof(x.FromDate)} required");
 
             RuleFor(x => x.ExpirationDate)
-                .Must(x => x != default)
-                .WithMessage(x => $"{nameof(x.ExpirationDate)} required")
                 .GreaterThan(x => x.ToDate)
                 .WithMessage(x => $"{nameof(x.ExpirationDate)} must be after {nameof(x.ToDate)}")
                 .When(x => x.ToDate != default)
