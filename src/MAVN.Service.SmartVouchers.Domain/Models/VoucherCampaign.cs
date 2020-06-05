@@ -16,6 +16,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public Guid PartnerId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public DateTime CreationDate { get; set; }
         public string CreatedBy { get; set; }
         public CampaignState State { get; set; }

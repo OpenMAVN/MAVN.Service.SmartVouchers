@@ -41,7 +41,7 @@ namespace MAVN.Job.SmartVouchers.Services
 
         private async Task Execute(ITimerTrigger timer, TimerTriggeredHandlerArgs args, CancellationToken cancellationToken)
         {
-            await _vouchersService.MarkVouchersFromFinishedCampaignsAsExpired();
+            await _vouchersService.MarkVouchersFromExpiredCampaignsAsExpired();
         }
     }
 }

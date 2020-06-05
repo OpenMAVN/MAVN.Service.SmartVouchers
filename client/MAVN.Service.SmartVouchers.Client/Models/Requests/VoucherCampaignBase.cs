@@ -29,5 +29,8 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 
         /// <summary>Voucher campaign end date</summary>
         public DateTime? ToDate { get; set; }
+
+        /// <summary>Voucher campaign expiration date</summary>
+        public DateTime? ExpirationDate { get; set; }
     }
 }

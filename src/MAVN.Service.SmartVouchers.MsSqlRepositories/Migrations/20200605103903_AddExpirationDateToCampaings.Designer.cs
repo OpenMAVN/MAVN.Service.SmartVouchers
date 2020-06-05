@@ -4,14 +4,16 @@ using MAVN.Service.SmartVouchers.MsSqlRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
 {
     [DbContext(typeof(SmartVouchersContext))]
-    partial class SmartVouchersContextModelSnapshot : ModelSnapshot
+    [Migration("20200605103903_AddExpirationDateToCampaings")]
+    partial class AddExpirationDateToCampaings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

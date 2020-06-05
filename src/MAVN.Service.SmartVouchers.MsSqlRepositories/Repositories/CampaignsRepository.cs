@@ -193,12 +193,12 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task<Guid[]> GetFinishedCampaignsIdsAsync(DateTime now)
+        public async Task<Guid[]> GetExpiredCampaignsIdsAsync(DateTime now)
         {
             using (var context = _contextFactory.CreateDataContext())
             {
                 var result = await context.VoucherCampaigns
-                    .Where(c => c.ToDate <= now)
+                    .Where(c => c.ExpirationDate <= now)
                     .Select(x => x.Id)
                     .ToArrayAsync();
 
