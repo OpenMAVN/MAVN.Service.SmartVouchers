@@ -393,7 +393,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         private bool IsCampaignDateValid(VoucherCampaign campaign)
             => DateTime.UtcNow > campaign.FromDate
-               || (campaign.ExpirationDate.HasValue && campaign.ExpirationDate.Value > DateTime.UtcNow);
+               && (!campaign.ExpirationDate.HasValue || campaign.ExpirationDate.Value > DateTime.UtcNow);
 
         private async Task PublishVoucherSoldEvent(Guid? paymentRequestId, VoucherCampaign voucherCampaign, Voucher voucher)
         {
