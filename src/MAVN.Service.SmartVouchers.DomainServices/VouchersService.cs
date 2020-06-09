@@ -389,11 +389,11 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         }
 
         private bool IsCampaignStateValid(VoucherCampaign campaign)
-            => campaign.State != CampaignState.Published;
+            => campaign.State == CampaignState.Published;
 
         private bool IsCampaignDateValid(VoucherCampaign campaign)
-            => DateTime.UtcNow < campaign.FromDate
-               || (campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow);
+            => DateTime.UtcNow > campaign.FromDate
+               && (!campaign.ExpirationDate.HasValue || campaign.ExpirationDate.Value > DateTime.UtcNow);
 
         private async Task PublishVoucherSoldEvent(Guid? paymentRequestId, VoucherCampaign voucherCampaign, Voucher voucher)
         {
