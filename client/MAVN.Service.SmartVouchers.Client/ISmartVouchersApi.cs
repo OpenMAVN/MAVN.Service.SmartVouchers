@@ -64,5 +64,12 @@ namespace MAVN.Service.SmartVouchers.Client
         /// <param name="pageData">Page data.</param>
         [Get("/api/vouchers/bycampaign")]
         Task<PaginatedVouchersListResponseModel> GetCampaignVouchersAsync(Guid campaignId, [Query] BasePaginationRequestModel pageData);
+
+        /// <summary>
+        /// Present vouchers to customers.
+        /// </summary>
+        /// <param name="request">The model that describes vouchers present request.</param>
+        [Post("/api/vouchers/present")]
+        Task<PresentVouchersResponse> PresentVouchersAsync([Body] PresentVouchersRequest request);
     }
 }
