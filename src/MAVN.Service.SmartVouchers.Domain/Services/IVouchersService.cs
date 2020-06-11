@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using MAVN.Service.SmartVouchers.Domain.Models;
@@ -23,5 +24,6 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
             TimeSpan finishPaymentTimeoutPeriod);
 
         Task MarkVouchersFromExpiredCampaignsAsExpired();
+        Task<PresentVouchersResult> PresentVouchersAsync(Guid campaignId, Guid adminId, List<string> customerEmails);
     }
 }

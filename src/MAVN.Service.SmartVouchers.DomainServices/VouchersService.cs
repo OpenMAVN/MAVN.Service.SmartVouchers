@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
+using MAVN.Service.CustomerProfile.Client;
+using MAVN.Service.CustomerProfile.Client.Models.Requests;
 using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.PaymentManagement.Client.Models.Requests;
@@ -26,6 +29,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         private readonly IPaymentManagementClient _paymentManagementClient;
         private readonly IPartnerManagementClient _partnerManagementClient;
+        private readonly ICustomerProfileClient _customerProfileClient;
         private readonly IVouchersRepository _vouchersRepository;
         private readonly ICampaignsRepository _campaignsRepository;
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
@@ -39,6 +43,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         public VouchersService(
             IPaymentManagementClient paymentManagementClient,
             IPartnerManagementClient partnerManagementClient,
+            ICustomerProfileClient customerProfileClient,
             IVouchersRepository vouchersRepository,
             ICampaignsRepository campaignsRepository,
             IPaymentRequestsRepository paymentRequestsRepository,
@@ -51,6 +56,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             _paymentManagementClient = paymentManagementClient;
             _partnerManagementClient = partnerManagementClient;
+            _customerProfileClient = customerProfileClient;
             _vouchersRepository = vouchersRepository;
             _campaignsRepository = campaignsRepository;
             _paymentRequestsRepository = paymentRequestsRepository;
@@ -101,8 +107,6 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
                 return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
-
-
 
             var voucherPriceIsZero = campaign.VoucherPrice == 0;
             var voucherCampaignIdStr = voucherCampaignId.ToString();
@@ -216,6 +220,127 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
         }
 
+        public async Task<PresentVouchersResult> PresentVouchersAsync(Guid campaignId, Guid adminId, List<string> customerEmails)
+        {
+            var campaign = await _campaignsRepository.GetByIdAsync(campaignId, false);
+            if (campaign == null)
+                return new PresentVouchersResult { Error = PresentVouchersErrorCodes.VoucherCampaignNotFound };
+
+            if (campaign.State != CampaignState.Published
+                || DateTime.UtcNow < campaign.FromDate
+                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+                return new PresentVouchersResult { Error = PresentVouchersErrorCodes.VoucherCampaignNotActive };
+
+            if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
+                return new PresentVouchersResult { Error = PresentVouchersErrorCodes.NotEnoughVouchersInStock };
+
+            if (campaign.CreatedBy != adminId.ToString())
+                return new PresentVouchersResult { Error = PresentVouchersErrorCodes.IncorrectAdminUser };
+
+            var (customerIds, notRegisteredEmails) = await GetCustomerIdsByEmails(customerEmails);
+            var voucherCampaignIdStr = campaignId.ToString();
+            var adminIdStr = adminId.ToString();
+            for (var i = 0; i < MaxAttemptsCount; ++i)
+            {
+                var locked = await _redisLocksService.TryAcquireLockAsync(
+                    voucherCampaignIdStr,
+                    adminIdStr,
+                    _lockTimeOut);
+
+                if (!locked)
+                {
+                    await Task.Delay(_lockTimeOut);
+                    continue;
+                }
+
+                var reservedVouchersCount = await _vouchersRepository.GetReservedVouchersCountForCampaign(campaignId);
+                var availableVouchersCount = campaign.VouchersTotalCount - campaign.BoughtVouchersCount - reservedVouchersCount;
+                if (availableVouchersCount < customerIds.Count)
+                {
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, adminIdStr);
+                    return new PresentVouchersResult { Error = PresentVouchersErrorCodes.NotEnoughVouchersInStock };
+                }
+
+                var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(campaignId, VoucherStatus.InStock);
+                foreach (var customerId in customerIds)
+                {
+                    Voucher voucher = null;
+                    if (vouchers.Any())
+                    {
+                        voucher = vouchers.First();
+
+                        voucher.Status = VoucherStatus.Sold;
+                        voucher.OwnerId = customerId;
+                        voucher.PurchaseDate = DateTime.UtcNow;
+                        await _vouchersRepository.UpdateAsync(voucher);
+                        vouchers.Remove(voucher);
+                    }
+                    else
+                    {
+                        var validationCode = GenerateValidation();
+                        voucher = new Voucher
+                        {
+                            CampaignId = campaignId,
+                            Status = VoucherStatus.Sold,
+                            OwnerId = customerId,
+                            PurchaseDate = DateTime.UtcNow,
+                        };
+
+                        voucher.Id = await _vouchersRepository.CreateAsync(voucher);
+                        voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
+
+                        await _vouchersRepository.UpdateAsync(voucher, validationCode);
+                    }
+
+                    await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
+                    {
+                        CampaignId = campaignId,
+                        PartnerId = campaign.PartnerId,
+                        Amount = 0,
+                        Currency = campaign.Currency,
+                        CustomerId = customerId,
+                        Timestamp = DateTime.UtcNow,
+                        VoucherShortCode = voucher.ShortCode,
+                    });
+                }
+
+                await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, adminIdStr);
+
+                return new PresentVouchersResult
+                {
+                    Error = PresentVouchersErrorCodes.None,
+                    NotRegisteredEmails = notRegisteredEmails.ToList(),
+                };
+            }
+
+            _log.Warning($"Couldn't get a lock when trying to present vouchers for voucher campaign {campaign}");
+
+            return new PresentVouchersResult { Error = PresentVouchersErrorCodes.CouldNotGetLock };
+        }
+
+        private async Task<(HashSet<Guid> CustomerIds, HashSet<string> NotRegisteredEmails)> GetCustomerIdsByEmails(List<string> customerEmails)
+        {
+            var customerIds = new HashSet<Guid>();
+            var notRegisteredEmails = new HashSet<string>();
+
+            foreach (var customerEmail in customerEmails)
+            {
+                var profile = await _customerProfileClient.CustomerProfiles.GetByEmailAsync(new GetByEmailRequestModel
+                {
+                    Email = customerEmail,
+                    IncludeNotVerified = true,
+                    IncludeNotActive = false
+                });
+
+                if (profile.Profile != null)
+                    customerIds.Add(Guid.Parse(profile.Profile.CustomerId));
+                else
+                    notRegisteredEmails.Add(customerEmail);
+            }
+
+            return (customerIds, notRegisteredEmails);
+        }
+
         public async Task<ProcessingVoucherError> CancelVoucherReservationAsync(string shortCode)
         {
             var voucher = await _vouchersRepository.GetByShortCodeAsync(shortCode);
@@ -270,7 +395,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 if (!linkedPartner.HasValue)
                     return RedeemVoucherError.SellerCustomerIsNotALinkedPartner;
 
-                if(linkedPartner.Value != campaign.PartnerId)
+                if (linkedPartner.Value != campaign.PartnerId)
                     return RedeemVoucherError.SellerCustomerIsNotTheVoucherIssuer;
             }
 
