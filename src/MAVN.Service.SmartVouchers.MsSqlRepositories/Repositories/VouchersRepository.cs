@@ -164,6 +164,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 var query = context.Vouchers.Where(v => v.OwnerId == ownerId);
 
                 var result = await query
+                    .OrderByDescending(x => x.PurchaseDate)
                     .Skip(skip)
                     .Take(take)
                     .ToListAsync();
