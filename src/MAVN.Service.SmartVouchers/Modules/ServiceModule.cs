@@ -69,10 +69,8 @@ namespace MAVN.Service.SmartVouchers.Modules
                 .SingleInstance();
 
             builder.RegisterPaymentManagementClient(_settings.PaymentManagementServiceClient, null);
-
             builder.RegisterPartnerManagementClient(_settings.PartnerManagementServiceClient, null);
             builder.RegisterCustomerProfileClient(_settings.CustomerProfileServiceClient, null);
-
         }
     }
 }

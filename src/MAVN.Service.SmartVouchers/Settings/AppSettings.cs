@@ -16,6 +16,5 @@ namespace MAVN.Service.SmartVouchers.Settings
         public PartnerManagementServiceClientSettings PartnerManagementServiceClient { get; set; }
 
         public CustomerProfileServiceClientSettings CustomerProfileServiceClient { get; set; }
-
     }
 }

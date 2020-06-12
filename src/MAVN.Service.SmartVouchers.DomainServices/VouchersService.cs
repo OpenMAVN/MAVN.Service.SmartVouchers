@@ -228,7 +228,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             if (campaign.State != CampaignState.Published
                 || DateTime.UtcNow < campaign.FromDate
-                || campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow)
+                || (campaign.ToDate.HasValue && campaign.ToDate.Value < DateTime.UtcNow))
                 return new PresentVouchersResult { Error = PresentVouchersErrorCodes.VoucherCampaignNotActive };
 
             if (campaign.VouchersTotalCount <= campaign.BoughtVouchersCount)
