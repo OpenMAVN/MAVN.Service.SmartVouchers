@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MAVN.Service.SmartVouchers.Client.Models.Requests
 {
+    /// <summary>
+    /// Request model to present vouchers
+    /// </summary>
     public class PresentVouchersRequest
     {
         /// <summary>
