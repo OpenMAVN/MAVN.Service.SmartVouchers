@@ -10,7 +10,7 @@
         /// </summary>
         None,
         /// <summary>
-        /// Voucher camaaign is missing
+        /// Voucher campaign is missing
         /// </summary>
         VoucherCampaignNotFound,
         /// <summary>
@@ -18,16 +18,12 @@
         /// </summary>
         VoucherCampaignNotActive,
         /// <summary>
-        /// Not enought vouchers in stock
+        /// Not enough vouchers in stock
         /// </summary>
         NotEnoughVouchersInStock,
         /// <summary>
         /// Admin user is not the creator of the campaign
         /// </summary>
         IncorrectAdminUser,
-        /// <summary>
-        /// Could not get redis lock
-        /// </summary>
-        CouldNotGetLock,
     }
 }

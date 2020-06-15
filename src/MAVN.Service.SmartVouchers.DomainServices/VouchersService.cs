@@ -315,7 +315,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             _log.Warning($"Couldn't get a lock when trying to present vouchers for voucher campaign {campaign}");
 
-            return new PresentVouchersResult { Error = PresentVouchersErrorCodes.CouldNotGetLock };
+            throw new Exception($"Couldn't get a lock when trying to present vouchers for voucher campaign {campaign}");
         }
 
         private async Task<(HashSet<Guid> CustomerIds, HashSet<string> NotRegisteredEmails)> GetCustomerIdsByEmails(List<string> customerEmails)

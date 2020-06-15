@@ -7,6 +7,5 @@
         VoucherCampaignNotActive,
         NotEnoughVouchersInStock,
         IncorrectAdminUser,
-        CouldNotGetLock,
     }
 }
