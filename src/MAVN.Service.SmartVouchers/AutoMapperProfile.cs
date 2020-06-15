@@ -66,6 +66,7 @@ namespace MAVN.Service.SmartVouchers
                 .ForMember(e => e.Language, opt => opt.Ignore());
 
             CreateMap<VoucherReservationResult, ReserveVoucherResponse>(MemberList.Destination);
+            CreateMap<PresentVouchersResult, PresentVouchersResponse>();
         }
     }
 }

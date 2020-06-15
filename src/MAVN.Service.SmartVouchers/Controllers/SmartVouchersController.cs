@@ -133,5 +133,18 @@ namespace MAVN.Service.SmartVouchers.Controllers
 
             return _mapper.Map<TransferVoucherErrorCodes>(result);
         }
+
+        /// <summary>
+        /// Present vouchers to customers.
+        /// </summary>
+        /// <param name="request">The model that describes vouchers present request.</param>
+        [HttpPost("present")]
+        [ProducesResponseType(typeof(PresentVouchersResponse), (int)HttpStatusCode.OK)]
+        public async Task<PresentVouchersResponse> PresentVouchersAsync([FromBody] PresentVouchersRequest request)
+        {
+            var result = await _vouchersService.PresentVouchersAsync(request.CampaignId, request.AdminId, request.CustomerEmails);
+
+            return _mapper.Map<PresentVouchersResponse>(result);
+        }
     }
 }

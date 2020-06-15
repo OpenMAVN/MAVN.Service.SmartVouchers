@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Lykke.Sdk;
 using Lykke.Sdk.Health;
 using Lykke.SettingsReader;
+using MAVN.Service.CustomerProfile.Client;
 using MAVN.Service.PartnerManagement.Client;
 using MAVN.Service.PaymentManagement.Client;
 using MAVN.Service.SmartVouchers.Services;
@@ -68,8 +69,8 @@ namespace MAVN.Service.SmartVouchers.Modules
                 .SingleInstance();
 
             builder.RegisterPaymentManagementClient(_settings.PaymentManagementServiceClient, null);
-
             builder.RegisterPartnerManagementClient(_settings.PartnerManagementServiceClient, null);
+            builder.RegisterCustomerProfileClient(_settings.CustomerProfileServiceClient, null);
         }
     }
 }

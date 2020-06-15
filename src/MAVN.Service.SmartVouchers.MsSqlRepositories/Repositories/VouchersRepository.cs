@@ -230,5 +230,16 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 return result;
             }
         }
+
+        public async Task<int> GetReservedVouchersCountForCampaign(Guid campaignId)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var result = await context.Vouchers
+                    .CountAsync(x => x.CampaignId == campaignId && x.Status == VoucherStatus.Reserved);
+
+                return result;
+            }
+        }
     }
 }
