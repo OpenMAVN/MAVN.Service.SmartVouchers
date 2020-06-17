@@ -122,9 +122,13 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     continue;
                 }
 
-                var hasAnyReservedVouchers = await _vouchersRepository.AnyReservedVouchersAsync(ownerId);
-                if (hasAnyReservedVouchers)
-                    return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher };
+                var alreadyReservedVoucher = await _vouchersRepository.GetReservedVoucherForCustomerAsync(ownerId);
+                if (alreadyReservedVoucher != null)
+                    return new VoucherReservationResult
+                    {
+                        ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher,
+                        AlreadyReservedVoucherShortCode = alreadyReservedVoucher.ShortCode
+                    };
 
                 var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
                 Voucher voucher = null;

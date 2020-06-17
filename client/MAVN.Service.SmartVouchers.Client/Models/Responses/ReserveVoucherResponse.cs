@@ -14,5 +14,8 @@ namespace MAVN.Service.SmartVouchers.Client.Models.Responses
 
         /// <summary>Payment url</summary>
         public string PaymentUrl { get; set; }
+
+        /// <summary>Short code of already reserved voucher</summary>
+        public string AlreadyReservedVoucherShortCode { get; set; }
     }
 }
