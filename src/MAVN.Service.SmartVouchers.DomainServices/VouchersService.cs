@@ -546,6 +546,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 Amount = voucherCampaign.VoucherPrice,
                 Currency = voucherCampaign.Currency,
                 LinkedCustomerId = voucher.SellerId,
+                VoucherShortCode = voucher.ShortCode,
             });
         }
 
