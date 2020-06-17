@@ -220,14 +220,14 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
-        public async Task<bool> AnyReservedVouchersAsync(Guid customerId)
+        public async Task<Voucher> GetReservedVoucherForCustomerAsync(Guid customerId)
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var result = await context.Vouchers
-                    .AnyAsync(x => x.OwnerId == customerId && x.Status == VoucherStatus.Reserved);
+                var entity = await context.Vouchers
+                    .FirstOrDefaultAsync(x => x.OwnerId == customerId && x.Status == VoucherStatus.Reserved);
 
-                return result;
+                return _mapper.Map<Voucher>(entity);
             }
         }
 

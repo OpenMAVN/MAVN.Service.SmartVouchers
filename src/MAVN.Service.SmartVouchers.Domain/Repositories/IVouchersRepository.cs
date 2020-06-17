@@ -25,7 +25,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
         Task<List<Voucher>> GetByCampaignIdAndStatusAsync(Guid campaignId, VoucherStatus status);
         Task<List<Voucher>> GetReservedVouchersBeforeDateAsync(DateTime reservationTimeoutDate);
         Task SetVouchersFromCampaignsAsExpired(Guid[] campaignsIds);
-        Task<bool> AnyReservedVouchersAsync(Guid customerId);
+        Task<Voucher> GetReservedVoucherForCustomerAsync(Guid customerId);
         Task<int> GetReservedVouchersCountForCampaign(Guid campaignId);
     }
 }

@@ -7,5 +7,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public ProcessingVoucherError ErrorCode { get; set; }
 
         public string PaymentUrl { get; set; }
+
+        public string AlreadyReservedVoucherShortCode { get; set; }
     }
 }
