@@ -46,5 +46,10 @@ namespace MAVN.Service.SmartVouchers.Contract
         /// Currency
         /// </summary>
         public string Currency { get; set; }
+
+        /// <summary>
+        /// Short code of the voucher
+        /// </summary>
+        public string VoucherShortCode { get; set; }
     }
 }
