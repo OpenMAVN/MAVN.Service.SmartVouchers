@@ -182,8 +182,6 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                         await _vouchersRepository.UpdateAsync(voucher, validationCode);
                     }
 
-                    await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-
                     if (voucherPriceIsZero)
                     {
                         await PublishVoucherSoldEvent(null, campaign, voucher);
