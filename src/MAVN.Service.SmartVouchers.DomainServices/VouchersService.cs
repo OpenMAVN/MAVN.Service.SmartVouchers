@@ -122,101 +122,106 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     continue;
                 }
 
-                var alreadyReservedVoucher = await _vouchersRepository.GetReservedVoucherForCustomerAsync(ownerId);
-                if (alreadyReservedVoucher != null)
-                    return new VoucherReservationResult
-                    {
-                        ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher,
-                        AlreadyReservedVoucherShortCode = alreadyReservedVoucher.ShortCode
-                    };
-
-                var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
-                Voucher voucher = null;
-                if (vouchers.Any())
+                try
                 {
-                    try
+                    var alreadyReservedVoucher = await _vouchersRepository.GetReservedVoucherForCustomerAsync(ownerId);
+                    if (alreadyReservedVoucher != null)
                     {
-                        voucher = vouchers.First();
-                        if (voucherPriceIsZero)
+                        return new VoucherReservationResult
                         {
-                            voucher.Status = VoucherStatus.Sold;
-                            voucher.OwnerId = ownerId;
-                            voucher.PurchaseDate = DateTime.UtcNow;
-                            await _vouchersRepository.UpdateAsync(voucher);
-                        }
-                        else
+                            ErrorCode = ProcessingVoucherError.CustomerHaveAnotherReservedVoucher,
+                            AlreadyReservedVoucherShortCode = alreadyReservedVoucher.ShortCode
+                        };
+                    }
+
+                    var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(voucherCampaignId, VoucherStatus.InStock);
+                    Voucher voucher = null;
+                    if (vouchers.Any())
+                    {
+                        try
                         {
-                            await _vouchersRepository.ReserveAsync(voucher, ownerId);
+                            voucher = vouchers.First();
+                            if (voucherPriceIsZero)
+                            {
+                                voucher.Status = VoucherStatus.Sold;
+                                voucher.OwnerId = ownerId;
+                                voucher.PurchaseDate = DateTime.UtcNow;
+                                await _vouchersRepository.UpdateAsync(voucher);
+                            }
+                            else
+                            {
+                                await _vouchersRepository.ReserveAsync(voucher, ownerId);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _log.Error(e);
+                            return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        _log.Error(e);
-                        await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-                        return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
+                        var vouchersPage = await _vouchersRepository.GetByCampaignIdAsync(voucherCampaignId, 0, 1);
+                        if (vouchersPage.TotalCount >= campaign.VouchersTotalCount)
+                        {
+                            return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
+                        }
+
+                        var validationCode = GenerateValidation();
+                        voucher = new Voucher
+                        {
+                            CampaignId = voucherCampaignId,
+                            Status = voucherPriceIsZero ? VoucherStatus.Sold : VoucherStatus.Reserved,
+                            OwnerId = ownerId,
+                            PurchaseDate = DateTime.UtcNow,
+                        };
+
+                        voucher.Id = await _vouchersRepository.CreateAsync(voucher);
+                        voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
+
+                        await _vouchersRepository.UpdateAsync(voucher, validationCode);
                     }
-                }
-                else
-                {
-                    var vouchersPage = await _vouchersRepository.GetByCampaignIdAsync(voucherCampaignId, 0, 1);
-                    if (vouchersPage.TotalCount >= campaign.VouchersTotalCount)
+
+                    if (voucherPriceIsZero)
                     {
-                        await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-                        return new VoucherReservationResult { ErrorCode = ProcessingVoucherError.NoAvailableVouchers };
+                        await PublishVoucherSoldEvent(null, campaign, voucher);
+                        return new VoucherReservationResult
+                        {
+                            ErrorCode = ProcessingVoucherError.None
+                        };
                     }
 
-                    var validationCode = GenerateValidation();
-                    voucher = new Voucher
+                    var paymentRequestResult = await _paymentManagementClient.Api.GeneratePaymentAsync(
+                        new PaymentGenerationRequest
+                        {
+                            CustomerId = ownerId,
+                            Amount = campaign.VoucherPrice,
+                            Currency = campaign.Currency,
+                            PartnerId = campaign.PartnerId,
+                            ExternalPaymentEntityId = voucher.ShortCode,
+                        });
+
+                    if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.None)
                     {
-                        CampaignId = voucherCampaignId,
-                        Status = voucherPriceIsZero ? VoucherStatus.Sold : VoucherStatus.Reserved,
-                        OwnerId = ownerId,
-                        PurchaseDate = DateTime.UtcNow,
-                    };
+                        await CancelReservationAsync(voucher.ShortCode);
+                        return new VoucherReservationResult
+                        {
+                            ErrorCode = ProcessingVoucherError.InvalidPartnerPaymentConfiguration,
+                        };
+                    }
 
-                    voucher.Id = await _vouchersRepository.CreateAsync(voucher);
-                    voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
+                    await _paymentRequestsRepository.CreatePaymentRequestAsync(paymentRequestResult.PaymentRequestId, voucher.ShortCode);
 
-                    await _vouchersRepository.UpdateAsync(voucher, validationCode);
-                }
-
-                await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
-
-                if (voucherPriceIsZero)
-                {
-                    await PublishVoucherSoldEvent(null, campaign, voucher);
                     return new VoucherReservationResult
                     {
-                        ErrorCode = ProcessingVoucherError.None
+                        ErrorCode = ProcessingVoucherError.None,
+                        PaymentUrl = paymentRequestResult.PaymentPageUrl,
                     };
                 }
-
-                var paymentRequestResult = await _paymentManagementClient.Api.GeneratePaymentAsync(
-                    new PaymentGenerationRequest
-                    {
-                        CustomerId = ownerId,
-                        Amount = campaign.VoucherPrice,
-                        Currency = campaign.Currency,
-                        PartnerId = campaign.PartnerId,
-                        ExternalPaymentEntityId = voucher.ShortCode,
-                    });
-
-                if (paymentRequestResult.ErrorCode != PaymentGenerationErrorCode.None)
+                finally
                 {
-                    await CancelReservationAsync(voucher.ShortCode);
-                    return new VoucherReservationResult
-                    {
-                        ErrorCode = ProcessingVoucherError.InvalidPartnerPaymentConfiguration,
-                    };
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, ownerId.ToString());
                 }
-
-                await _paymentRequestsRepository.CreatePaymentRequestAsync(paymentRequestResult.PaymentRequestId, voucher.ShortCode);
-
-                return new VoucherReservationResult
-                {
-                    ErrorCode = ProcessingVoucherError.None,
-                    PaymentUrl = paymentRequestResult.PaymentPageUrl,
-                };
             }
 
             _log.Warning($"Couldn't get a lock for voucher campaign {voucherCampaignId}");
@@ -257,64 +262,67 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                     continue;
                 }
 
-                var reservedVouchersCount = await _vouchersRepository.GetReservedVouchersCountForCampaign(campaignId);
-                var availableVouchersCount = campaign.VouchersTotalCount - campaign.BoughtVouchersCount - reservedVouchersCount;
-                if (availableVouchersCount < customerIds.Count)
+                try
                 {
-                    await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, adminIdStr);
-                    return new PresentVouchersResult { Error = PresentVouchersErrorCodes.NotEnoughVouchersInStock };
-                }
+                    var reservedVouchersCount = await _vouchersRepository.GetReservedVouchersCountForCampaign(campaignId);
+                    var availableVouchersCount = campaign.VouchersTotalCount - campaign.BoughtVouchersCount - reservedVouchersCount;
 
-                var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(campaignId, VoucherStatus.InStock);
-                foreach (var customerId in customerIds)
-                {
-                    Voucher voucher = null;
-                    if (vouchers.Any())
-                    {
-                        voucher = vouchers.First();
+                    if (availableVouchersCount < customerIds.Count)
+                        return new PresentVouchersResult { Error = PresentVouchersErrorCodes.NotEnoughVouchersInStock };
 
-                        voucher.Status = VoucherStatus.Sold;
-                        voucher.OwnerId = customerId;
-                        voucher.PurchaseDate = DateTime.UtcNow;
-                        await _vouchersRepository.UpdateAsync(voucher);
-                        vouchers.Remove(voucher);
-                    }
-                    else
+                    var vouchers = await _vouchersRepository.GetByCampaignIdAndStatusAsync(campaignId, VoucherStatus.InStock);
+                    foreach (var customerId in customerIds)
                     {
-                        var validationCode = GenerateValidation();
-                        voucher = new Voucher
+                        Voucher voucher = null;
+                        if (vouchers.Any())
+                        {
+                            voucher = vouchers.First();
+
+                            voucher.Status = VoucherStatus.Sold;
+                            voucher.OwnerId = customerId;
+                            voucher.PurchaseDate = DateTime.UtcNow;
+                            await _vouchersRepository.UpdateAsync(voucher);
+                            vouchers.Remove(voucher);
+                        }
+                        else
+                        {
+                            var validationCode = GenerateValidation();
+                            voucher = new Voucher
+                            {
+                                CampaignId = campaignId,
+                                Status = VoucherStatus.Sold,
+                                OwnerId = customerId,
+                                PurchaseDate = DateTime.UtcNow,
+                            };
+
+                            voucher.Id = await _vouchersRepository.CreateAsync(voucher);
+                            voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
+
+                            await _vouchersRepository.UpdateAsync(voucher, validationCode);
+                        }
+
+                        await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
                         {
                             CampaignId = campaignId,
-                            Status = VoucherStatus.Sold,
-                            OwnerId = customerId,
-                            PurchaseDate = DateTime.UtcNow,
-                        };
-
-                        voucher.Id = await _vouchersRepository.CreateAsync(voucher);
-                        voucher.ShortCode = GenerateShortCodeFromId(voucher.Id);
-
-                        await _vouchersRepository.UpdateAsync(voucher, validationCode);
+                            PartnerId = campaign.PartnerId,
+                            Amount = 0,
+                            Currency = campaign.Currency,
+                            CustomerId = customerId,
+                            Timestamp = DateTime.UtcNow,
+                            VoucherShortCode = voucher.ShortCode,
+                        });
                     }
 
-                    await _voucherSoldPublisher.PublishAsync(new SmartVoucherSoldEvent
+                    return new PresentVouchersResult
                     {
-                        CampaignId = campaignId,
-                        PartnerId = campaign.PartnerId,
-                        Amount = 0,
-                        Currency = campaign.Currency,
-                        CustomerId = customerId,
-                        Timestamp = DateTime.UtcNow,
-                        VoucherShortCode = voucher.ShortCode,
-                    });
+                        Error = PresentVouchersErrorCodes.None,
+                        NotRegisteredEmails = notRegisteredEmails.ToList(),
+                    };
                 }
-
-                await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, adminIdStr);
-
-                return new PresentVouchersResult
+                finally
                 {
-                    Error = PresentVouchersErrorCodes.None,
-                    NotRegisteredEmails = notRegisteredEmails.ToList(),
-                };
+                    await _redisLocksService.ReleaseLockAsync(voucherCampaignIdStr, adminIdStr);
+                }
             }
 
             _log.Warning($"Couldn't get a lock when trying to present vouchers for voucher campaign {campaign}");
