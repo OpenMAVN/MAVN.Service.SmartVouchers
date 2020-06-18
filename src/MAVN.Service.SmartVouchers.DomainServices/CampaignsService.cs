@@ -210,7 +210,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
         private bool IsCampaignEditable(VoucherCampaign existingCampaign, VoucherCampaign updatedCampaign)
         {
-            if (existingCampaign.State != CampaignState.Published || existingCampaign.FromDate > DateTime.UtcNow)
+            if (existingCampaign.State == CampaignState.Draft || existingCampaign.FromDate > DateTime.UtcNow)
                 return true;
 
             if (existingCampaign.VoucherPrice != updatedCampaign.VoucherPrice ||
