@@ -10,6 +10,8 @@ namespace MAVN.Job.SmartVouchers.Settings.JobSettings
 
         public RedisSettings Redis { set; get; }
 
+        public NotificationsSettings Notifications { get; set; }
+
         public TimeSpan VoucherLockTimeOut { get; set; }
 
         public TimeSpan ExpiredVouchersJobIdlePeriod { get; set; }

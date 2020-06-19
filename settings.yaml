@@ -26,6 +26,9 @@ SmartVouchersService:
       settings-key: SmartVouchersService-Redis-ConnectionString
   VoucherLockTimeOut:
     settings-key: SmartVouchersService-VoucherLockTimeOut
+  Notifications:
+    VoucherRedemptionSucceededPushNotificationTemplateId:
+      settings-key: SmartVouchersService-Notifications-VoucherRedemptionSucceededPushNotificationTemplateId
 SmartVouchersJob:
   Db:
     LogsConnString:
@@ -64,6 +67,9 @@ SmartVouchersJob:
     settings-key: SmartVouchersJob-FinishPaymentTimeoutPeriod
   CompletedCampaignsJobIdlePeriod:
     settings-key: SmartVouchersJob-CompletedCampaignsJobIdlePeriod
+  Notifications:
+    VoucherRedemptionSucceededPushNotificationTemplateId:
+      settings-key: SmartVouchersService-Notifications-VoucherRedemptionSucceededPushNotificationTemplateId
 SlackNotifications:
     AzureQueue:
         ConnectionString:

@@ -14,5 +14,7 @@ namespace MAVN.Service.SmartVouchers.Settings
         public RedisSettings Redis { set; get; }
 
         public TimeSpan VoucherLockTimeOut { get; set; }
+
+        public NotificationsSettings Notifications { get; set; }
     }
 }

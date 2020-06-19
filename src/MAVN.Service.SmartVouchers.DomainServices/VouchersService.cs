@@ -34,6 +34,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private readonly ICampaignsRepository _campaignsRepository;
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
         private readonly IRedisLocksService _redisLocksService;
+        private readonly INotificationsService _notificationsService;
         private readonly IRabbitPublisher<SmartVoucherSoldEvent> _voucherSoldPublisher;
         private readonly IRabbitPublisher<SmartVoucherUsedEvent> _voucherUsedPublisher;
         private readonly IRabbitPublisher<SmartVoucherTransferredEvent> _voucherTransferredPublisher;
@@ -49,6 +50,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             IPaymentRequestsRepository paymentRequestsRepository,
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
+            INotificationsService notificationsService,
             IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
             IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher,
             IRabbitPublisher<SmartVoucherTransferredEvent> voucherTransferredPublisher,
@@ -61,6 +63,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _campaignsRepository = campaignsRepository;
             _paymentRequestsRepository = paymentRequestsRepository;
             _redisLocksService = redisLocksService;
+            _notificationsService = notificationsService;
             _voucherSoldPublisher = voucherSoldPublisher;
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
@@ -417,6 +420,13 @@ namespace MAVN.Service.SmartVouchers.DomainServices
 
             await _vouchersRepository.UpdateAsync(voucher);
             await PublishVoucherUsedEvent(campaign, voucher);
+
+            var partner = await _partnerManagementClient.Partners.GetByIdAsync(campaign.PartnerId);
+            if (partner == null)
+                _log.Warning("Missing partner when redeeming smart voucher", context: campaign.PartnerId);
+
+            await _notificationsService.PublishVoucherSuccessfullyRedeemed(voucher.OwnerId.Value.ToString(),
+                partner?.Name, voucher.ShortCode);
 
             return RedeemVoucherError.None;
         }
