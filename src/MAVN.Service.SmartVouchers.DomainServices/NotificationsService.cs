@@ -35,8 +35,8 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 CustomPayload = new Dictionary<string, string>
                 {
                     {"route", "voucher-usage-success"},
-                    {"PartnerName", partnerName},
-                    {"VoucherShortCode", voucherShortCode}
+                    {"partner-name", partnerName},
+                    {"voucher-short-code", voucherShortCode}
                 }
             });
         }
