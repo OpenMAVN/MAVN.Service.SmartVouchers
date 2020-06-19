@@ -68,6 +68,11 @@ namespace MAVN.Service.SmartVouchers.Modules
                 .As<IRedisLocksService>()
                 .SingleInstance();
 
+            builder.RegisterType<NotificationsService>()
+                .As<INotificationsService>()
+                .WithParameter(TypedParameter.From(_settings.SmartVouchersService.Notifications.VoucherRedemptionSucceededPushNotificationTemplateId))
+                .SingleInstance();
+
             builder.RegisterPaymentManagementClient(_settings.PaymentManagementServiceClient, null);
             builder.RegisterPartnerManagementClient(_settings.PartnerManagementServiceClient, null);
             builder.RegisterCustomerProfileClient(_settings.CustomerProfileServiceClient, null);

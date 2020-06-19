@@ -5,6 +5,7 @@ using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.SettingsReader;
 using MAVN.Job.SmartVouchers.Settings;
 using MAVN.Job.SmartVouchers.Settings.JobSettings;
+using MAVN.Service.NotificationSystem.SubscriberContract;
 using MAVN.Service.PaymentManagement.Contract;
 using MAVN.Service.SmartVouchers.Contract;
 using MAVN.Service.SmartVouchers.DomainServices.RabbitSubscribers;
@@ -17,6 +18,7 @@ namespace MAVN.Job.SmartVouchers.Modules
         private const string PubVoucherSoldExchangeName = "lykke.smart-vouchers.vouchersold";
         private const string PubVoucherUsedExchangeName = "lykke.smart-vouchers.voucherused";
         private const string PubVoucherTransferredExchangeName = "lykke.smart-vouchers.vouchertransferred";
+        private const string PubPushNotificationExchangeName = "notificationsystem.command.pushnotification";
         private const string SubExchangeName = "lykke.payment.completed"; // TODO pass proper exchange name
 
         private readonly RabbitMqSettings _settings;
@@ -47,6 +49,9 @@ namespace MAVN.Job.SmartVouchers.Modules
             builder.RegisterJsonRabbitPublisher<SmartVoucherTransferredEvent>(
                 _settings.Publishers.ConnectionString,
                 PubVoucherTransferredExchangeName);
+            builder.RegisterJsonRabbitPublisher<PushNotificationEvent>(
+                _settings.Publishers.ConnectionString,
+                PubPushNotificationExchangeName);
         }
 
         private void RegisterRabbitMqSubscribers(ContainerBuilder builder)
