@@ -27,8 +27,17 @@ namespace MAVN.Service.SmartVouchers.DomainServices
                 CustomerId = customerId,
                 Source = $"{AppEnvironment.Name} - {AppEnvironment.Version}",
                 MessageTemplateId = _voucherRedemptionSucceededTemplateId,
-                TemplateParameters = new Dictionary<string, string> { { "PartnerName", partnerName }, { "VoucherShortCode", voucherShortCode } },
-                CustomPayload = new Dictionary<string, string> { { "route", "voucher-usage-success" } }
+                TemplateParameters =
+                    new Dictionary<string, string>
+                    {
+                        {"PartnerName", partnerName}, {"VoucherShortCode", voucherShortCode}
+                    },
+                CustomPayload = new Dictionary<string, string>
+                {
+                    {"route", "voucher-usage-success"},
+                    {"PartnerName", partnerName},
+                    {"VoucherShortCode", voucherShortCode}
+                }
             });
         }
     }
