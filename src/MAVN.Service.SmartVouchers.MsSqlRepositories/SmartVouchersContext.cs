@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using JetBrains.Annotations;
-using MAVN.Common.MsSql;
+using MAVN.Persistence.PostgreSQL.Legacy;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MAVN.Service.SmartVouchers.MsSqlRepositories
 {
-    public class SmartVouchersContext : MsSqlContext
+    public class SmartVouchersContext : PostgreSQLContext
     {
         private const string Schema = "smart_vouchers";
 
@@ -41,7 +41,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories
         {
         }
 
-        protected override void OnLykkeModelCreating(ModelBuilder modelBuilder)
+        protected override void OnMAVNModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<VoucherCampaignEntity>()
                 .Property(o => o.State).HasConversion(new EnumToNumberConverter<CampaignState, short>());

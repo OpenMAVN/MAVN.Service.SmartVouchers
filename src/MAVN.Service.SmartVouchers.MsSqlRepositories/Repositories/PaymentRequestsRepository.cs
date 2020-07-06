@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MAVN.Common.MsSql;
+using MAVN.Persistence.PostgreSQL.Legacy;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
 using MAVN.Service.SmartVouchers.MsSqlRepositories.Entities;
 using Microsoft.EntityFrameworkCore;
