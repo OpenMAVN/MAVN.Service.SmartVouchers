@@ -134,6 +134,22 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             return campaign;
         }
 
+        public async Task<VoucherCampaign> GetCampaignOfTheDayAsync()
+        {
+            var campaign = await _campaignsRepository.GetRandomCampaignAsync();
+
+            if (campaign == null)
+                return null;
+
+            foreach (var content in campaign.LocalizedContents)
+            {
+                if (content.ContentType == CampaignContentType.ImageUrl)
+                    content.Image = await _fileService.GetAsync(content.Id);
+            }
+
+            return campaign;
+        }
+
         public async Task<CampaignsPage> GetCampaignsAsync(CampaignListRequest request)
         {
             var campaigns = await _campaignsRepository.GetCampaignsAsync(request);

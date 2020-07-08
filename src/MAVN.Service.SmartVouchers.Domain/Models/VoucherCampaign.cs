@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MAVN.Service.SmartVouchers.Domain.Enums;
 
 namespace MAVN.Service.SmartVouchers.Domain.Models
@@ -22,5 +23,26 @@ namespace MAVN.Service.SmartVouchers.Domain.Models
         public CampaignState State { get; set; }
 
         public List<VoucherCampaignContent> LocalizedContents { get; set; }
+
+        public string GetContent(CampaignContentType contentType, Language language)
+        {
+            if (LocalizedContents == null)
+                return null;
+
+            var contentValue = LocalizedContents
+                .FirstOrDefault(o => o.ContentType == contentType && o.Language == language)?.Value;
+
+            if (contentValue != null)
+                return contentValue;
+
+            var englishContentValue = LocalizedContents
+                .FirstOrDefault(o => o.ContentType == contentType && o.Language == Language.En)?.Value;
+
+            if (englishContentValue != null)
+                return englishContentValue;
+
+            return LocalizedContents
+                .FirstOrDefault(o => o.ContentType == contentType)?.Value;
+        }
     }
 }

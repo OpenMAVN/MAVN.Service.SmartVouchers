@@ -71,5 +71,17 @@ namespace MAVN.Service.SmartVouchers.Client
         /// <param name="request">The model that describes vouchers present request.</param>
         [Post("/api/vouchers/present")]
         Task<PresentVouchersResponse> PresentVouchersAsync([Body] PresentVouchersRequest request);
+
+        /// <summary>
+        /// Get the soonest to expire smart voucher for customer
+        /// </summary>
+        [Get("/api/vouchers/soonest-to-expire")]
+        Task<VoucherWithCampaignInfoResponse> GetCustomerSoonestToExpireVouchersAsync([Query] Guid customerId);
+
+        /// <summary>
+        /// Get reserved voucher for customer
+        /// </summary>
+        [Get("/api/vouchers/reserved")]
+        Task<VoucherWithCampaignInfoResponse> GetCustomerReservedVouchersAsync([Query] Guid customerId);
     }
 }

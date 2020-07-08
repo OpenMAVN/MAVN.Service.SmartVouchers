@@ -20,5 +20,6 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
             GetPublishedAndActiveCampaignsVouchersCountAsync();
 
         Task MarkCampaignsAsCompletedAsync();
+        Task<VoucherCampaign> GetCampaignOfTheDayAsync();
     }
 }

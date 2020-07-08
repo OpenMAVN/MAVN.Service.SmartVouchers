@@ -35,6 +35,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         private readonly IPaymentRequestsRepository _paymentRequestsRepository;
         private readonly IRedisLocksService _redisLocksService;
         private readonly INotificationsService _notificationsService;
+        private readonly IFileService _fileService;
         private readonly IRabbitPublisher<SmartVoucherSoldEvent> _voucherSoldPublisher;
         private readonly IRabbitPublisher<SmartVoucherUsedEvent> _voucherUsedPublisher;
         private readonly IRabbitPublisher<SmartVoucherTransferredEvent> _voucherTransferredPublisher;
@@ -51,6 +52,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             ILogFactory logFactory,
             IRedisLocksService redisLocksService,
             INotificationsService notificationsService,
+            IFileService fileService,
             IRabbitPublisher<SmartVoucherSoldEvent> voucherSoldPublisher,
             IRabbitPublisher<SmartVoucherUsedEvent> voucherUsedPublisher,
             IRabbitPublisher<SmartVoucherTransferredEvent> voucherTransferredPublisher,
@@ -64,6 +66,7 @@ namespace MAVN.Service.SmartVouchers.DomainServices
             _paymentRequestsRepository = paymentRequestsRepository;
             _redisLocksService = redisLocksService;
             _notificationsService = notificationsService;
+            _fileService = fileService;
             _voucherSoldPublisher = voucherSoldPublisher;
             _log = logFactory.CreateLog(this);
             _lockTimeOut = lockTimeOut;
@@ -533,6 +536,79 @@ namespace MAVN.Service.SmartVouchers.DomainServices
         {
             var finishedCampaignsIds = await _campaignsRepository.GetExpiredCampaignsIdsAsync(DateTime.UtcNow);
             await _vouchersRepository.SetVouchersFromCampaignsAsExpired(finishedCampaignsIds);
+        }
+
+        public async Task<VoucherWithCampaignInfo> GetSoonestToExpireVoucherAsync(Guid customerId)
+        {
+            var (voucher, campaign) = await _vouchersRepository.GetSoonestToExpireVoucherAsync(customerId);
+
+            if (voucher == null || campaign == null)
+                return null;
+
+            foreach (var content in campaign.LocalizedContents)
+            {
+                if (content.ContentType == CampaignContentType.ImageUrl)
+                    content.Image = await _fileService.GetAsync(content.Id);
+            }
+
+            var result = new VoucherWithCampaignInfo
+            {
+                ShortCode = voucher.ShortCode,
+                CampaignId = voucher.CampaignId,
+                PartnerId = campaign.PartnerId,
+                Id = voucher.Id,
+                OwnerId = voucher.OwnerId.Value,
+                Status = voucher.Status,
+                PurchaseDate = voucher.PurchaseDate,
+                Currency = campaign.Currency,
+                CampaignName = campaign.GetContent(CampaignContentType.Name, Language.En),
+                Description = campaign.GetContent(CampaignContentType.Description, Language.En),
+                ImageUrl = campaign.GetContent(CampaignContentType.ImageUrl, Language.En),
+                ExpirationDate = campaign.ExpirationDate,
+                Price = campaign.VoucherPrice,
+                RedemptionDate = voucher.RedemptionDate,
+            };
+
+            return result;
+        }
+
+        public async Task<VoucherWithCampaignInfo> GetReservedVoucherAsync(Guid customerId)
+        {
+            var voucher = await _vouchersRepository.GetReservedVoucherForCustomerAsync(customerId);
+
+            if (voucher == null)
+                return null;
+
+            var campaign = await _campaignsRepository.GetByIdAsync(voucher.CampaignId, true);
+
+            if (campaign == null)
+                return null;
+
+            foreach (var content in campaign.LocalizedContents)
+            {
+                if (content.ContentType == CampaignContentType.ImageUrl)
+                    content.Image = await _fileService.GetAsync(content.Id);
+            }
+
+            var result = new VoucherWithCampaignInfo
+            {
+                ShortCode = voucher.ShortCode,
+                CampaignId = voucher.CampaignId,
+                PartnerId = campaign.PartnerId,
+                Id = voucher.Id,
+                OwnerId = voucher.OwnerId.Value,
+                Status = voucher.Status,
+                PurchaseDate = voucher.PurchaseDate,
+                Currency = campaign.Currency,
+                CampaignName = campaign.GetContent(CampaignContentType.Name, Language.En),
+                Description = campaign.GetContent(CampaignContentType.Description, Language.En),
+                ImageUrl = campaign.GetContent(CampaignContentType.ImageUrl, Language.En),
+                ExpirationDate = campaign.ExpirationDate,
+                Price = campaign.VoucherPrice,
+                RedemptionDate = voucher.RedemptionDate,
+            };
+
+            return result;
         }
 
         private bool IsCampaignStateValid(VoucherCampaign campaign)

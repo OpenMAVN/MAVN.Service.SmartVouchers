@@ -69,5 +69,12 @@ namespace MAVN.Service.SmartVouchers.Client
         /// </summary>
         [Get("/api/campaigns/totalvouchers")]
         Task<PublishedAndActiveCampaignsVouchersCountResponse> GetPublishedAndActiveCampaignsVouchersCountAsync();
+
+        /// <summary>
+        /// Get the campaign of the day
+        /// </summary>
+        /// <response code="200">Campaign.</response>
+        [Get("/api/campaigns/campaing-of-the-day")]
+        Task<VoucherCampaignDetailsResponseModel> GetCampaignOfTheDayAsync();
     }
 }

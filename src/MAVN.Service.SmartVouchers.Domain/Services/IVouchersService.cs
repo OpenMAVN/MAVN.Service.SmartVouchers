@@ -25,5 +25,7 @@ namespace MAVN.Service.SmartVouchers.Domain.Services
 
         Task MarkVouchersFromExpiredCampaignsAsExpired();
         Task<PresentVouchersResult> PresentVouchersAsync(Guid campaignId, Guid adminId, List<string> customerEmails);
+        Task<VoucherWithCampaignInfo> GetSoonestToExpireVoucherAsync(Guid customerId);
+        Task<VoucherWithCampaignInfo> GetReservedVoucherAsync(Guid customerId);
     }
 }

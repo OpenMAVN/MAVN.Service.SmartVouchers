@@ -17,5 +17,6 @@ namespace MAVN.Service.SmartVouchers.Domain.Repositories
             GetPublishedAndActiveCampaignsVouchersCountAsync();
         Task<Guid[]> GetExpiredCampaignsIdsAsync(DateTime now);
         Task SetFinishedCampaignsAsCompletedAsync(DateTime now);
+        Task<VoucherCampaign> GetRandomCampaignAsync();
     }
 }

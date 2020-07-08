@@ -81,6 +81,31 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
             }
         }
 
+        public async Task<VoucherCampaign> GetRandomCampaignAsync()
+        {
+            var now = DateTime.UtcNow;
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var query = context.VoucherCampaigns
+                    .Where(c => c.FromDate < now && c.State == CampaignState.Published && (c.ToDate == null || c.ToDate > now))
+                    .Include(c => c.LocalizedContents);
+
+                var count = await query.CountAsync();
+
+                if (count == 0)
+                    return null;
+
+                var rnd = new Random();
+
+                var entity = await query
+                    .Skip(rnd.Next(0, count - 1))
+                    .Take(1)
+                    .FirstOrDefaultAsync();
+
+                return _mapper.Map<VoucherCampaign>(entity);
+            }
+        }
+
         public async Task<IReadOnlyCollection<VoucherCampaign>> GetCampaignsByIdsAsync(Guid[] campaignIds)
         {
             using (var context = _contextFactory.CreateDataContext())
