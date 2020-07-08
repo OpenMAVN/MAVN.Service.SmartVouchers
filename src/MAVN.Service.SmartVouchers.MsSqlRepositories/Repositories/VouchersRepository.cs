@@ -241,5 +241,25 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Repositories
                 return result;
             }
         }
+
+        public async Task<(Voucher voucher, VoucherCampaign campaign)> GetSoonestToExpireVoucherAsync(Guid customerId)
+        {
+            using (var context = _contextFactory.CreateDataContext())
+            {
+                var now = DateTime.UtcNow;
+
+                var result = await context.Vouchers
+                    .Where(x => x.OwnerId == customerId && x.Status == VoucherStatus.Sold)
+                    .Join(context.VoucherCampaigns
+                            .Where(x => x.ExpirationDate > now)
+                            .Include(x => x.LocalizedContents),
+                        voucher => voucher.CampaignId, campaign => campaign.Id,
+                        (voucher, campaign) => new {voucher, campaign})
+                    .OrderBy(x => x.campaign.ExpirationDate)
+                    .FirstOrDefaultAsync();
+
+                return (_mapper.Map<Voucher>(result?.voucher), _mapper.Map<VoucherCampaign>(result?.campaign));
+            }
+        }
     }
 }

@@ -146,5 +146,35 @@ namespace MAVN.Service.SmartVouchers.Controllers
 
             return _mapper.Map<PresentVouchersResponse>(result);
         }
+
+        /// <summary>
+        /// Get the soonest to expire smart voucher for customer
+        /// </summary>
+        [HttpGet("soonest-to-expire")]
+        [ProducesResponseType(typeof(VoucherWithCampaignInfoResponse), (int)HttpStatusCode.OK)]
+        public async Task<VoucherWithCampaignInfoResponse> GetCustomerSoonestToExpireVouchersAsync([FromQuery][Required] Guid customerId)
+        {
+            if (customerId == default)
+                throw new ArgumentNullException(nameof(customerId));
+
+            var result = await _vouchersService.GetSoonestToExpireVoucherAsync(customerId);
+
+            return _mapper.Map<VoucherWithCampaignInfoResponse>(result);
+        }
+
+        /// <summary>
+        /// Get reserved voucher for customer
+        /// </summary>
+        [HttpGet("reserved")]
+        [ProducesResponseType(typeof(VoucherWithCampaignInfoResponse), (int)HttpStatusCode.OK)]
+        public async Task<VoucherWithCampaignInfoResponse> GetCustomerReservedVouchersAsync([FromQuery][Required] Guid customerId)
+        {
+            if (customerId == default)
+                throw new ArgumentNullException(nameof(customerId));
+
+            var result = await _vouchersService.GetReservedVoucherAsync(customerId);
+
+            return _mapper.Map<VoucherWithCampaignInfoResponse>(result);
+        }
     }
 }

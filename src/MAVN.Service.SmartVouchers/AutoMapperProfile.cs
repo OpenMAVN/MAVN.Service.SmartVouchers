@@ -67,6 +67,7 @@ namespace MAVN.Service.SmartVouchers
 
             CreateMap<VoucherReservationResult, ReserveVoucherResponse>(MemberList.Destination);
             CreateMap<PresentVouchersResult, PresentVouchersResponse>();
+            CreateMap<VoucherWithCampaignInfo, VoucherWithCampaignInfoResponse>();
         }
     }
 }

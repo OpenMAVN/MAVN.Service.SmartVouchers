@@ -148,5 +148,18 @@ namespace MAVN.Service.SmartVouchers.Controllers
                 PublishedCampaignsVouchersTotalCount = result.publishedCampaingsVouchersCount
             };
         }
+
+        /// <inheritdoc/>
+        /// <response code="200">Campaign.</response>
+        [HttpGet("campaing-of-the-day")]
+        [ProducesResponseType(typeof(VoucherCampaignDetailsResponseModel), (int)HttpStatusCode.OK)]
+        public async Task<VoucherCampaignDetailsResponseModel> GetCampaignOfTheDayAsync()
+        {
+            var campaign = await _campaignsService.GetCampaignOfTheDayAsync();
+
+            var campaignModel = _mapper.Map<VoucherCampaignDetailsResponseModel>(campaign);
+
+            return campaignModel;
+        }
     }
 }
