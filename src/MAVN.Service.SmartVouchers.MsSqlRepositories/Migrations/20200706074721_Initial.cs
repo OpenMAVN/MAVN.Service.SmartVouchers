@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,9 +23,10 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
                     bought_vouchers_count = table.Column<int>(nullable: false),
                     voucher_price = table.Column<decimal>(nullable: false),
                     currency = table.Column<string>(nullable: false),
-                    partner_id = table.Column<string>(nullable: false),
+                    partner_id = table.Column<Guid>(nullable: false),
                     from_date = table.Column<DateTime>(nullable: false),
                     to_date = table.Column<DateTime>(nullable: true),
+                    expiration_date = table.Column<DateTime>(nullable: true),
                     creation_date = table.Column<DateTime>(nullable: false),
                     created_by = table.Column<string>(nullable: false),
                     state = table.Column<short>(nullable: false)
@@ -35,17 +37,30 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "payment_request",
+                schema: "smart_vouchers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(nullable: false),
+                    short_code = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_payment_request", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "voucher",
                 schema: "smart_vouchers",
                 columns: table => new
                 {
                     id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     short_code = table.Column<string>(nullable: true),
-                    validation_code_hash = table.Column<string>(nullable: false),
+                    seller_id = table.Column<Guid>(nullable: true),
                     campaign_id = table.Column<Guid>(nullable: false),
                     status = table.Column<short>(nullable: false),
-                    owner_id = table.Column<Guid>(nullable: false),
+                    owner_id = table.Column<Guid>(nullable: true),
                     purchase_date = table.Column<DateTime>(nullable: true),
                     redemption_date = table.Column<DateTime>(nullable: true)
                 },
@@ -83,7 +98,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
                 columns: table => new
                 {
                     id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     voucher_id = table.Column<long>(nullable: false),
                     validation_code = table.Column<string>(nullable: false)
                 },
@@ -106,6 +121,12 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
                 column: "campaign_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_payment_request_short_code",
+                schema: "smart_vouchers",
+                table: "payment_request",
+                column: "short_code");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_voucher_campaign_id",
                 schema: "smart_vouchers",
                 table: "voucher",
@@ -122,8 +143,7 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
                 schema: "smart_vouchers",
                 table: "voucher",
                 column: "short_code",
-                unique: true,
-                filter: "[short_code] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_voucher_validation_voucher_id",
@@ -137,6 +157,10 @@ namespace MAVN.Service.SmartVouchers.MsSqlRepositories.Migrations
         {
             migrationBuilder.DropTable(
                 name: "campaign_content",
+                schema: "smart_vouchers");
+
+            migrationBuilder.DropTable(
+                name: "payment_request",
                 schema: "smart_vouchers");
 
             migrationBuilder.DropTable(

@@ -4,9 +4,9 @@ using AzureStorage.Blob;
 using AzureStorage.Tables;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
-using MAVN.Common.MsSql;
 using Lykke.SettingsReader;
 using MAVN.Job.SmartVouchers.Settings;
+using MAVN.Persistence.PostgreSQL.Legacy;
 using MAVN.Service.SmartVouchers.AzureRepositories;
 using MAVN.Service.SmartVouchers.AzureRepositories.Entities;
 using MAVN.Service.SmartVouchers.Domain.Repositories;
@@ -47,7 +47,7 @@ namespace MAVN.Job.SmartVouchers.Modules
                 .As<IPaymentRequestsRepository>()
                 .SingleInstance();
 
-            builder.RegisterMsSql(
+            builder.RegisterPostgreSQL(
                 _connectionString,
                 connString => new SmartVouchersContext(connString, false),
                 dbConn => new SmartVouchersContext(dbConn));
